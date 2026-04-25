@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiSearch, HiMenu, HiX, HiBell, HiUser } from 'react-icons/hi';
+import { HiSearch, HiMenu, HiX, HiBell } from 'react-icons/hi';
 import { MdMovie } from 'react-icons/md';
 import { useSidebar } from '../context/SidebarContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -12,6 +13,7 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { toggle } = useSidebar();
+  const { isAuthenticated, currentUser, logout } = useAuth();
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -27,6 +29,20 @@ export default function Navbar() {
       setSearchOpen(false);
     }
   };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const initials = currentUser?.name
+    ? currentUser.name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase()
+    : 'U';
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
@@ -145,12 +161,41 @@ export default function Navbar() {
             </AnimatePresence>
           </div>
 
-          {/* Profile */}
-          <button className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 hover:border-primary transition-colors">
-            <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <HiUser className="w-4 h-4 text-white" />
-            </div>
-          </button>
+          {/* Auth actions */}
+          {isAuthenticated ? (
+            <>
+              <Link
+                to="/profile"
+                className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 hover:border-primary transition-colors"
+                title="Profile"
+              >
+                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-semibold text-white">
+                  {initials}
+                </div>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="hidden sm:inline-flex px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="hidden sm:inline-flex px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="inline-flex px-3 py-1.5 rounded-lg text-xs font-medium bg-primary hover:bg-red-700 transition-colors"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
@@ -169,6 +214,41 @@ export default function Navbar() {
             {link.name}
           </Link>
         ))}
+        {!isAuthenticated ? (
+          <>
+            <Link
+              to="/login"
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                location.pathname === '/login'
+                  ? 'bg-primary text-white'
+                  : 'bg-white/5 text-gray-400 hover:text-white'
+              }`}
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                location.pathname === '/register'
+                  ? 'bg-primary text-white'
+                  : 'bg-white/5 text-gray-400 hover:text-white'
+              }`}
+            >
+              Register
+            </Link>
+          </>
+        ) : (
+          <Link
+            to="/profile"
+            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+              location.pathname === '/profile'
+                ? 'bg-primary text-white'
+                : 'bg-white/5 text-gray-400 hover:text-white'
+            }`}
+          >
+            Profile
+          </Link>
+        )}
       </div>
     </nav>
   );
