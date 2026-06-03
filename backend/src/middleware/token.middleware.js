@@ -1,7 +1,6 @@
 import jsonwebtoken from "jsonwebtoken"
-import { ApiResponce } from "../utils/ApiResponse.js"
-import { ApiError } from "../utils/ApiError.js"
-import { User } from "../models/user.model.js"
+import responseHandler from "../handlers/response.handler.js"
+import User from "../models/user.model.js"
 
 const tokenDecode = (req) => {
     try {
@@ -17,7 +16,7 @@ const tokenDecode = (req) => {
         }
 
         return false
-    } catch (error) {
+    } catch {
         return false
     }
 }
@@ -25,15 +24,13 @@ const tokenDecode = (req) => {
 const auth = async (req, res, next) => {
     const tokenDecoded = tokenDecode(req)
 
-    if (!tokenDecode) {
-        throw new ApiError(401, "Unauthorized Request");
-    }
+    if (!tokenDecode) 
+        return responseHandler.unauthorize(res)
 
     const user = await User.findById(tokenDecoded.data)
 
-    if (!user) {
-        throw new ApiError(401, "Unauthorized Request")
-    }
+    if (!user) 
+        return responseHandler.unauthorize(res)
 
     req.user = user
 
