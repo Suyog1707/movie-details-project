@@ -1,13 +1,13 @@
 import jsonwebtoken from "jsonwebtoken"
-import {ApiResponce} from "../utils/ApiResponse.js"
-import {ApiError} from "../utils/ApiError.js"
-import {User} from "../models/user.model.js"
+import { ApiResponce } from "../utils/ApiResponse.js"
+import { ApiError } from "../utils/ApiError.js"
+import { User } from "../models/user.model.js"
 
 const tokenDecode = (req) => {
     try {
         const bearerHeader = req.header["authorization"]
 
-        if(bearerHeader) {
+        if (bearerHeader) {
             const token = bearerHeader.split(" ")[1]
 
             return jsonwebtoken.verify(
@@ -22,7 +22,7 @@ const tokenDecode = (req) => {
     }
 }
 
-const auth = async(req, res, next) => {
+const auth = async (req, res, next) => {
     const tokenDecoded = tokenDecode(req)
 
     if (!tokenDecode) {

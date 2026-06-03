@@ -8,16 +8,10 @@ const userSchema = new mongoose.Schema({
         unique: true,
         required: true
     },
-    fullName: {
+    displayName: {
         type: String,
         required: true
     },
-    avaterImage: [
-        {
-            type: String,
-            default: ""
-        }
-    ],
     password: {
         type: String,
         required: true
@@ -52,4 +46,6 @@ userSchema.method.validPassword = function (password) {
     return this.password === hash
 }
 
-export const User = mongoose.model("User", userSchema)
+const User = mongoose.model("User", userSchema)
+
+export default User
