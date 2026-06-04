@@ -77,11 +77,11 @@ const signIn = async (req, res) => {
 
 const updatePassword = async (req, res) => {
     try {
-        const {password, newPassword} = req.body
+        const { password, newPassword } = req.body
 
         const user = await User.findById(req.user.id).select("password id salt")
 
-        if (!user) 
+        if (!user)
             return responseHandler.unauthorize(res)
 
         if (!user.validPassword(password))
@@ -104,7 +104,7 @@ const getInfo = async (req, res) => {
         if (!user)
             return responseHandler.notFound(res)
 
-        responseHandler.ok(res, user)
+        return responseHandler.ok(res, user)
     } catch {
         responseHandler.error(res)
     }
