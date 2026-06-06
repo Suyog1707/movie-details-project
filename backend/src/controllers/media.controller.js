@@ -1,7 +1,7 @@
 import responseHandler from "../handlers/response.handler.js";
 import tmdbApi from "../tmdb/tmdb.api.js"
 import User from "../models/user.model.js"
-import Favorite from "../models/favorite.model.js"
+import { Favorite } from "../models/favorite.model.js"
 import Review from "../models/review.model.js"
 import tokenMiddleware from "../middleware/token.middleware.js"
 
