@@ -12,10 +12,10 @@ const signUp = async (req, res) => {
         if (!(password === confirmPassword))
             return responseHandler.badrequest(res, "Password and Confirm password should be same")
 
-        const checkUser = await User.findOne(userName)
+        const checkUser = await User.findOne({userName})
 
         if (checkUser) {
-            return responseHandler.badrequest(res, "username already exsist")
+            return responseHandler.badrequest(res, "userName already exsist")
         }
 
         const user = new User()
@@ -24,7 +24,7 @@ const signUp = async (req, res) => {
         user.displayName = displayName
         user.setPassword(password)
 
-        await user.save
+        await user.save()
 
         const token = jsonwebtoken.sign(
             { data: user.id },
@@ -50,7 +50,7 @@ const signIn = async (req, res) => {
         const user = await User.findOne({ userName }).select("userName password salt id displayName")
 
         if (!user)
-            return responseHandler.badrequest(res, "username dosen't exsist")
+            return responseHandler.badrequest(res, "userName dosen't exsist")
 
         if (!user.validPassword(password))
             return responseHandler.badrequest(res, "Password incorrect")
@@ -89,7 +89,7 @@ const updatePassword = async (req, res) => {
 
         user.setPassword(newPassword)
 
-        await user.save
+        await user.save()
 
         responseHandler.ok(res)
     } catch {

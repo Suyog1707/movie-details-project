@@ -10,11 +10,11 @@ const router = express.Router()
 
 router.post(
     "/signup",
-    body("username")
+    body("userName")
         .exists().withMessage("Username is required")
         .isLength({ min: 8 }).withMessage("Username minimum 8 charaters")
         .custom(async value => {
-            const user = await User.findOne({ username: value })
+            const user = await User.findOne({ userName: value })
 
             if (user)
                 return Promise.reject("Username already used")
@@ -39,7 +39,7 @@ router.post(
 
 router.post(
     "/signin",
-    body("username")
+    body("userName")
         .exists().withMessage("Username is required")
         .isLength({ min: 8 }).withMessage("Username minimum 8 charaters"),
     body("password")
@@ -87,7 +87,7 @@ router.post(
     tokenMiddleware.auth,
     body("mediatype")
         .exists().withMessage("mediatype password is required")
-        .custom(type => [movies, tv].includes(type)).withMessage("mediatype invalid"),
+        .custom(type => ["movie", "tv"].includes(type)).withMessage("mediatype invalid"),
     body("mediaId")
         .exists().withMessage("mediaId is required")
         .isLength({ min: 1 }).withMessage("mediaId can not be empty"),

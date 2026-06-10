@@ -23,7 +23,7 @@ router.post(
         .isLength({ min: 1 }).withMessage("content can not be empty"),
     body("mediatype")
         .exists().withMessage("mediatype password is required")
-        .custom(type => [movies, tv].includes(type)).withMessage("mediatype invalid"),
+        .custom(type => ["movie", "tv"].includes(type)).withMessage("mediatype invalid"),
     body("mediaTitle")
         .exists().withMessage("mediaTitle is required"),
     body("mediaPoster")
