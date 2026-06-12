@@ -76,7 +76,7 @@ export default function Sidebar() {
         </div>
 
         {/* Bottom section */}
-        <div className="p-4 mt-4 border-t border-white/5">
+        <div className="p-4 mb-14 border-t border-white/5">
           <div className="glass-card p-4 text-center">
             <p className="text-xs text-gray-400 mb-2">Upgrade to Premium</p>
             <p className="text-[10px] text-gray-500 mb-3">Get 4K streaming + no ads</p>

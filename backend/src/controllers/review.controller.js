@@ -18,7 +18,8 @@ const create = async (req, res) => {
             id: review.id,
             user: req.user
         })
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }
@@ -38,7 +39,8 @@ const remove = async (req, res) => {
         await review.remove()
 
         responseHandler.ok(res)
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }
@@ -50,7 +52,8 @@ const getReviewOfUser = async (req, res) => {
         }).sort("-createdAt")
 
         return responseHandler.ok(res, review)
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }

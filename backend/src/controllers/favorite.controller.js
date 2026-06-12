@@ -19,7 +19,8 @@ const addFavorite = async (req, res) => {
         await favorite.save
 
         responseHandler.created(res, favorite)
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }
@@ -39,7 +40,8 @@ const removeFavorite = async (req, res) => {
         await favorite.remove()
 
         return responseHandler.ok(res)
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }
@@ -49,7 +51,8 @@ const getFavoritesOfUser = async (req, res) => {
         const favorite = await Favorite.find({ user: req.user.id }).sort("-createdAt")
 
         return responseHandler.ok(res, favorite)
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }

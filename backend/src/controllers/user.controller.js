@@ -38,7 +38,8 @@ const signUp = async (req, res) => {
             id: user.id
         })
 
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }
@@ -70,7 +71,8 @@ const signIn = async (req, res) => {
             id: user.id
         })
 
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }
@@ -92,7 +94,8 @@ const updatePassword = async (req, res) => {
         await user.save()
 
         responseHandler.ok(res)
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }
@@ -105,7 +108,8 @@ const getInfo = async (req, res) => {
             return responseHandler.notFound(res)
 
         return responseHandler.ok(res, user)
-    } catch {
+    } catch (error) {
+        console.error(error)
         responseHandler.error(res)
     }
 }

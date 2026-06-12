@@ -7,6 +7,8 @@ const validate = (req, res, next) => {
         return res
             .status(400)
             .json(errors.array()[0].msg)
+
+    next()
 }
 
 export default { validate }

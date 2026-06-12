@@ -9,13 +9,13 @@ const app = express()
 app.use(cors())
 app.use(cookieparser())
 app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 
 app.get(
     "/",
     (req,res) => {
         res.send("Server is Running Properly")
     })
-app.use("api/v1", routes)
+app.use("/api/v1", routes)
 
 export const server = http.createServer(app)
