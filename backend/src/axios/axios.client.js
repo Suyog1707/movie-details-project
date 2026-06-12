@@ -1,8 +1,12 @@
 import axios from "axios"
 
 const get = async (url) => {
-    const response = await axios.get(url)
-    return response.data
+    try {
+        const response = await axios.get(url)
+        return response.data
+    } catch (error) {
+        console.log('TMBD error:', error)
+    }
 }
 
 export default { get }
