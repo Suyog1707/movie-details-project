@@ -5,40 +5,6 @@ import { HiSearch, HiTrendingUp, HiClock, HiX } from 'react-icons/hi';
 import MovieCard from '../components/MovieCard';
 
 export default function SearchPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
-  const [query, setQuery] = useState(initialQuery);
-  const [recentSearches, setRecentSearches] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('cineverse_recent_searches') || '[]');
-    } catch { return []; }
-  });
-
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    return allContent.filter(item =>
-      item.title.toLowerCase().includes(q) ||
-      item.genres.some(g => g.toLowerCase().includes(q)) ||
-      item.director?.toLowerCase().includes(q) ||
-      item.cast?.some(c => c.name.toLowerCase().includes(q))
-    );
-  }, [query]);
-
-  const handleSearch = (term) => {
-    setQuery(term);
-    setSearchParams({ q: term });
-    // Add to recent searches
-    const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, 8);
-    setRecentSearches(updated);
-    localStorage.setItem('cineverse_recent_searches', JSON.stringify(updated));
-  };
-
-  const removeRecent = (term) => {
-    const updated = recentSearches.filter(s => s !== term);
-    setRecentSearches(updated);
-    localStorage.setItem('cineverse_recent_searches', JSON.stringify(updated));
-  };
 
   return (
     <motion.div

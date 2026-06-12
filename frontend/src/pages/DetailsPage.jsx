@@ -7,26 +7,6 @@ import OTTCard from '../components/OTTCard';
 import MovieCard from '../components/MovieCard';
 
 export default function DetailsPage() {
-  const { id } = useParams();
-  const item = getContentById(id);
-  const { toggleFavorite, isFavorite } = useFavorites();
-
-  if (!item) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <p className="text-2xl mb-4">😕</p>
-          <p className="text-gray-400 text-lg">Content not found</p>
-          <Link to="/" className="text-primary text-sm mt-2 inline-block hover:underline">Back to Home</Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Related content: same genre
-  const related = allContent
-    .filter(c => c.id !== item.id && c.genres.some(g => item.genres.includes(g)))
-    .slice(0, 10);
 
   return (
     <motion.div

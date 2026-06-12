@@ -4,24 +4,6 @@ import { HiFilter, HiTrash } from 'react-icons/hi';
 import MovieCard from '../components/MovieCard';
 
 export default function FavoritesPage() {
-  const { favorites, removeFavorite } = useFavorites();
-  const [sortBy, setSortBy] = useState('added');
-  const [selectedGenre, setSelectedGenre] = useState('All');
-
-  const filtered = useMemo(() => {
-    let result = [...favorites];
-
-    if (selectedGenre !== 'All') {
-      result = result.filter(m => m.genres.includes(selectedGenre));
-    }
-
-    if (sortBy === 'rating') result.sort((a, b) => b.rating - a.rating);
-    else if (sortBy === 'year') result.sort((a, b) => b.releaseYear - a.releaseYear);
-    else if (sortBy === 'title') result.sort((a, b) => a.title.localeCompare(b.title));
-    // 'added' = default order
-
-    return result;
-  }, [favorites, selectedGenre, sortBy]);
 
   return (
     <motion.div

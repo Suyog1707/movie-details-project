@@ -5,42 +5,6 @@ import { HiSearch, HiMenu, HiX, HiBell } from 'react-icons/hi';
 import { MdMovie } from 'react-icons/md';
 
 export default function Navbar() {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showNotifications, setShowNotifications] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { toggle } = useSidebar();
-  const { isAuthenticated, currentUser, logout } = useAuth();
-
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Movies', path: '/movies' },
-    { name: 'TV Shows', path: '/tv-shows' },
-    { name: 'Favorites', path: '/favorites' },
-  ];
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchOpen(false);
-    }
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  const initials = currentUser?.name
-    ? currentUser.name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase()
-    : 'U';
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">

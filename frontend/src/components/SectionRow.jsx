@@ -4,16 +4,6 @@ import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import MovieCard from './MovieCard';
 
 export default function SectionRow({ title, subtitle, items, showProgress = false }) {
-  const scrollRef = useRef(null);
-
-  const scroll = (direction) => {
-    if (scrollRef.current) {
-      const amount = direction === 'left' ? -600 : 600;
-      scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
-    }
-  };
-
-  if (!items || items.length === 0) return null;
 
   return (
     <motion.section

@@ -3,26 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError('');
-
-    try {
-      login({ email, password });
-      const redirectTo = location.state?.from?.pathname || '/profile';
-      navigate(redirectTo, { replace: true });
-    } catch (err) {
-      setError(err.message || 'Unable to log in right now.');
-    }
-  };
 
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-10 lg:px-8 flex items-center justify-center">

@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { HiStar, HiHeart, HiPlay } from 'react-icons/hi';
 
 export default function MovieCard({ movie, index = 0, showProgress = false }) {
-  const { toggleFavorite, isFavorite } = useFavorites();
 
   return (
     <motion.div

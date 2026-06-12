@@ -3,14 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { HiX } from 'react-icons/hi';
 
 export default function Sidebar() {
-  const { isOpen, close, activeGenre, setActiveGenre } = useSidebar();
-  const navigate = useNavigate();
-
-  const handleGenreClick = (genre) => {
-    setActiveGenre(genre.name === activeGenre ? null : genre.name);
-    navigate(`/movies?genre=${encodeURIComponent(genre.name)}`);
-    close();
-  };
 
   return (
     <>

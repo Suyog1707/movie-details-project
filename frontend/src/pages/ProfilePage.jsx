@@ -2,29 +2,6 @@ import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function ProfilePage() {
-  const { currentUser, updateProfile } = useAuth();
-  const { favorites } = useFavorites();
-
-  const [name, setName] = useState(currentUser?.name || '');
-  const [bio, setBio] = useState(currentUser?.bio || '');
-  const [saved, setSaved] = useState(false);
-
-  const initials = useMemo(() => {
-    if (!currentUser?.name) return 'U';
-    return currentUser.name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase();
-  }, [currentUser?.name]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    updateProfile({ name, bio });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
 
   return (
     <div className="px-4 py-8 lg:px-8">

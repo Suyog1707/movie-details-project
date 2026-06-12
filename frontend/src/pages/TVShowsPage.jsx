@@ -4,31 +4,6 @@ import { HiSearch, HiFilter } from 'react-icons/hi';
 import MovieCard from '../components/MovieCard';
 
 export default function TVShowsPage() {
-  const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState('rating');
-  const [selectedGenre, setSelectedGenre] = useState('All');
-
-  const filtered = useMemo(() => {
-    let result = [...tvShows];
-
-    if (selectedGenre !== 'All') {
-      result = result.filter(m => m.genres.includes(selectedGenre));
-    }
-
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(m =>
-        m.title.toLowerCase().includes(q) ||
-        m.genres.some(g => g.toLowerCase().includes(q))
-      );
-    }
-
-    if (sortBy === 'rating') result.sort((a, b) => b.rating - a.rating);
-    else if (sortBy === 'year') result.sort((a, b) => b.releaseYear - a.releaseYear);
-    else if (sortBy === 'title') result.sort((a, b) => a.title.localeCompare(b.title));
-
-    return result;
-  }, [selectedGenre, search, sortBy]);
 
   return (
     <motion.div

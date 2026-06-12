@@ -1,22 +1,6 @@
 import { motion } from 'framer-motion';
 import { HiExternalLink } from 'react-icons/hi';
 
-const platformColors = {
-  'Netflix': 'from-red-600 to-red-800',
-  'Amazon Prime': 'from-blue-600 to-blue-800',
-  'Disney+ Hotstar': 'from-blue-500 to-indigo-700',
-  'YouTube Movies': 'from-red-500 to-red-700',
-  'Apple TV': 'from-gray-600 to-gray-800',
-};
-
-const platformLogos = {
-  'Netflix': 'N',
-  'Amazon Prime': 'P',
-  'Disney+ Hotstar': 'D+',
-  'YouTube Movies': 'YT',
-  'Apple TV': '▶',
-};
-
 export default function OTTCard({ platform, index = 0 }) {
   return (
     <motion.div

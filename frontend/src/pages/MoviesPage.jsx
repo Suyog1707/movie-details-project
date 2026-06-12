@@ -5,36 +5,6 @@ import { HiSearch, HiFilter, HiStar } from 'react-icons/hi';
 import MovieCard from '../components/MovieCard';
 
 export default function MoviesPage() {
-  const [searchParams] = useSearchParams();
-  const genreFilter = searchParams.get('genre');
-  const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState('rating');
-  const [selectedGenre, setSelectedGenre] = useState(genreFilter || 'All');
-
-  const filtered = useMemo(() => {
-    let result = [...movies];
-
-    // Filter by genre
-    if (selectedGenre && selectedGenre !== 'All') {
-      result = result.filter(m => m.genres.includes(selectedGenre));
-    }
-
-    // Search
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(m =>
-        m.title.toLowerCase().includes(q) ||
-        m.genres.some(g => g.toLowerCase().includes(q))
-      );
-    }
-
-    // Sort
-    if (sortBy === 'rating') result.sort((a, b) => b.rating - a.rating);
-    else if (sortBy === 'year') result.sort((a, b) => b.releaseYear - a.releaseYear);
-    else if (sortBy === 'title') result.sort((a, b) => a.title.localeCompare(b.title));
-
-    return result;
-  }, [selectedGenre, search, sortBy]);
 
   return (
     <motion.div

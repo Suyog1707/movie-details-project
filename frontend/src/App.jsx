@@ -19,9 +19,6 @@ function RequireAuth({ children }) {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <FavoritesProvider>
-          <SidebarProvider>
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<HomePage />} />
@@ -35,16 +32,11 @@ function App() {
                 <Route
                   path="profile"
                   element={(
-                    <RequireAuth>
                       <ProfilePage />
-                    </RequireAuth>
                   )}
                 />
               </Route>
             </Routes>
-          </SidebarProvider>
-        </FavoritesProvider>
-      </AuthProvider>
     </Router>
   );
 }

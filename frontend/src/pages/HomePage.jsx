@@ -3,13 +3,6 @@ import HeroBanner from '../components/HeroBanner';
 import SectionRow from '../components/SectionRow';
 
 export default function HomePage() {
-  const { favorites } = useFavorites();
-
-  const popularMovies = movies.filter(m => m.popular);
-  const popularTVShows = tvShows.filter(t => t.popular);
-  const topRated = allContent.filter(item => item.topRated);
-  const trending = allContent.filter(item => item.trending);
-  const recentlyAdded = allContent.filter(item => item.recentlyAdded);
 
   return (
     <motion.div

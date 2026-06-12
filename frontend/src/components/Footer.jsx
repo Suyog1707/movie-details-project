@@ -3,19 +3,6 @@ import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube, FaGithub } from 'react-
 import { MdMovie } from 'react-icons/md';
 
 export default function Footer() {
-  const footerLinks = {
-    'Company': ['About Us', 'Careers', 'Press', 'Contact'],
-    'Support': ['Help Center', 'Safety', 'Terms of Service', 'Privacy Policy'],
-    'Explore': ['Movies', 'TV Shows', 'New Releases', 'Trending'],
-  };
-
-  const socialLinks = [
-    { icon: FaFacebookF, href: '#', label: 'Facebook' },
-    { icon: FaTwitter, href: '#', label: 'Twitter' },
-    { icon: FaInstagram, href: '#', label: 'Instagram' },
-    { icon: FaYoutube, href: '#', label: 'YouTube' },
-    { icon: FaGithub, href: '#', label: 'GitHub' },
-  ];
 
   return (
     <footer className="bg-dark-800 border-t border-white/5 mt-16">
