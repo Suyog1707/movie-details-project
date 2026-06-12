@@ -5,8 +5,6 @@ import CastCard from '../components/CastCard';
 import TrailerCard from '../components/TrailerCard';
 import OTTCard from '../components/OTTCard';
 import MovieCard from '../components/MovieCard';
-import { getContentById, allContent } from '../data/movies';
-import { useFavorites } from '../context/FavoritesContext';
 
 export default function DetailsPage() {
   const { id } = useParams();

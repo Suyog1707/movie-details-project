@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion';
 import HeroBanner from '../components/HeroBanner';
 import SectionRow from '../components/SectionRow';
-import { movies, tvShows, allContent, continueWatching } from '../data/movies';
-import { useFavorites } from '../context/FavoritesContext';
 
 export default function HomePage() {
   const { favorites } = useFavorites();

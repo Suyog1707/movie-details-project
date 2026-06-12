@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiPlay, HiHeart, HiStar, HiCalendar } from 'react-icons/hi';
-import { useFavorites } from '../context/FavoritesContext';
 
 const featured = [0, 3, 5, 7]; // indices into the data array
 

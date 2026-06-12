@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { HiSearch, HiFilter } from 'react-icons/hi';
 import MovieCard from '../components/MovieCard';
-import { tvShows, genres } from '../data/movies';
 
 export default function TVShowsPage() {
   const [search, setSearch] = useState('');

@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiSearch, HiFilter, HiStar } from 'react-icons/hi';
 import MovieCard from '../components/MovieCard';
-import { movies, genres } from '../data/movies';
 
 export default function MoviesPage() {
   const [searchParams] = useSearchParams();

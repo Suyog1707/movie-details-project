@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiSearch, HiTrendingUp, HiClock, HiX } from 'react-icons/hi';
 import MovieCard from '../components/MovieCard';
-import { allContent, trendingSearches } from '../data/movies';
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();

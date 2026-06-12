@@ -1,8 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiX } from 'react-icons/hi';
-import { useSidebar } from '../context/SidebarContext';
-import { genres } from '../data/movies';
 
 export default function Sidebar() {
   const { isOpen, close, activeGenre, setActiveGenre } = useSidebar();

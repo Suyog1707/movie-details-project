@@ -2,8 +2,6 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiFilter, HiTrash } from 'react-icons/hi';
 import MovieCard from '../components/MovieCard';
-import { useFavorites } from '../context/FavoritesContext';
-import { genres } from '../data/movies';
 
 export default function FavoritesPage() {
   const { favorites, removeFavorite } = useFavorites();

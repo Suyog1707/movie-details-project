@@ -1,8 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
-import { FavoritesProvider } from './context/FavoritesContext';
-import { SidebarProvider } from './context/SidebarContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import MoviesPage from './pages/MoviesPage';

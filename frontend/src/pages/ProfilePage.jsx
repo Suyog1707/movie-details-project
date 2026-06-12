@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
-import { useFavorites } from '../context/FavoritesContext';
 
 export default function ProfilePage() {
   const { currentUser, updateProfile } = useAuth();

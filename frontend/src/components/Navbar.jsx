@@ -3,8 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiSearch, HiMenu, HiX, HiBell } from 'react-icons/hi';
 import { MdMovie } from 'react-icons/md';
-import { useSidebar } from '../context/SidebarContext';
-import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);

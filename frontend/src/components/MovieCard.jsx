@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiStar, HiHeart, HiPlay } from 'react-icons/hi';
-import { useFavorites } from '../context/FavoritesContext';
 
 export default function MovieCard({ movie, index = 0, showProgress = false }) {
   const { toggleFavorite, isFavorite } = useFavorites();
