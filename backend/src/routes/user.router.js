@@ -85,24 +85,18 @@ router.get(
 router.post(
     "/favorites",
     tokenMiddleware.auth,
-    body("mediatype")
+    body("mediaType")
         .exists().withMessage("mediatype password is required")
         .custom(type => ["movie", "tv"].includes(type)).withMessage("mediatype invalid"),
     body("mediaId")
         .exists().withMessage("mediaId is required")
         .isLength({ min: 1 }).withMessage("mediaId can not be empty"),
-    body("mediaTitle")
-        .exists().withMessage("mediaTitle is required"),
-    body("mediaPoster")
-        .exists().withMessage("mediaPoster is required"),
-    body("mediaRate")
-        .exists().withMessage("mediaRate is required"),
     requestHandler.validate,
     favoriteController.addFavorite
 )
 
 router.delete(
-    "/favorites/:favoriteId",
+    "/favorites/:mediaId",
     tokenMiddleware.auth,
     favoriteController.removeFavorite
 )

@@ -12,11 +12,11 @@ const addFavorite = async (req, res) => {
             return responseHandler.ok(res, isFavorite)
 
         const favorite = new Favorite({
-            ...req.body,
-            user: req.user.id
+            user: req.user.id,
+            ...req.body
         })
 
-        await favorite.save
+        await favorite.save()
 
         responseHandler.created(res, favorite)
     } catch (error) {
@@ -27,19 +27,19 @@ const addFavorite = async (req, res) => {
 
 const removeFavorite = async (req, res) => {
     try {
-        const { favoriteId } = req.params
+        const { mediaId } = req.params
 
         const favorite = await Favorite.findOne({
             user: req.user.id,
-            _id: favoriteId
+            mediaId
         })
 
         if (!favorite)
             return responseHandler.notFound(res)
 
-        await favorite.remove()
+        await favorite.deleteOne()
 
-        return responseHandler.ok(res)
+        return responseHandler.ok(res, "Deleted successfully")
     } catch (error) {
         console.error(error)
         responseHandler.error(res)
@@ -49,6 +49,8 @@ const removeFavorite = async (req, res) => {
 const getFavoritesOfUser = async (req, res) => {
     try {
         const favorite = await Favorite.find({ user: req.user.id }).sort("-createdAt")
+
+        if (!favorite) return responseHandler.notFound(res, "favorites not found")
 
         return responseHandler.ok(res, favorite)
     } catch (error) {

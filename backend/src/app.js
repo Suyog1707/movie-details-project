@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.get(
     "/",
-    (req,res) => {
+    (req, res) => {
         res.send("Server is Running Properly")
     })
 app.use("/api/v1", routes)

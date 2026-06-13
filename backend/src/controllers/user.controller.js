@@ -12,7 +12,7 @@ const signUp = async (req, res) => {
         if (!(password === confirmPassword))
             return responseHandler.badrequest(res, "Password and Confirm password should be same")
 
-        const checkUser = await User.findOne({userName})
+        const checkUser = await User.findOne({ userName })
 
         if (checkUser) {
             return responseHandler.badrequest(res, "userName already exsist")

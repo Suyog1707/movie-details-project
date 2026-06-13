@@ -2,14 +2,14 @@ const modelOptions = {
     toJSON: {
         Virtuals: true,
         transform: (_, obj) => {
-            delete odj._id;
+            delete obj._id;
             return obj
         }
     },
     toObject: {
         Virtuals: true,
         transform: (_, obj) => {
-            delete odj._id;
+            delete obj._id;
             return obj
         }
     },
