@@ -1,8 +1,36 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 export default function RegisterPage() {
+
+  const [userNmae, setUserName] = useState("")
+  const [displayName, setDisplayName] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const handleSignUp = async (e) => {
+    e.preventDefault()
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/signup`,
+        {
+          userNmae,
+          displayName,
+          password,
+          confirmPassword
+        }
+      );
+
+      console.log(response.data)
+
+      localStorage.setItem("token", response.data.token);
+
+    } catch (error) {
+      console.error(error.response?.data);
+    }
+  }
 
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-10 lg:px-8 flex items-center justify-center">
@@ -16,13 +44,13 @@ export default function RegisterPage() {
 
         {error && <div className="mb-4 rounded-lg bg-red-500/20 text-red-200 text-sm px-3 py-2">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSignUp} className="space-y-4">
           <div>
-            <label className="block text-sm mb-1 text-gray-300">Full name</label>
+            <label className="block text-sm mb-1 text-gray-300">Username</label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={userNmae}
+              onChange={(e) => setUserName(e.target.value)}
               required
               className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-white/10 focus:outline-none focus:border-primary"
               placeholder="Your name"
@@ -30,11 +58,11 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm mb-1 text-gray-300">Email</label>
+            <label className="block text-sm mb-1 text-gray-300">Display name</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
               required
               className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-white/10 focus:outline-none focus:border-primary"
               placeholder="you@example.com"

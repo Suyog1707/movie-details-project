@@ -11,32 +11,30 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 
-function RequireAuth({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+function PrivateRoute({ children }) {
+  const token = localStorage.getItem("token");
+
+  return token ? children : <Navigate to="/login" />;
 }
 
 function App() {
   return (
     <Router>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<HomePage />} />
-                <Route path="movies" element={<MoviesPage />} />
-                <Route path="tv-shows" element={<TVShowsPage />} />
-                <Route path="favorites" element={<FavoritesPage />} />
-                <Route path="details/:id" element={<DetailsPage />} />
-                <Route path="search" element={<SearchPage />} />
-                <Route path="login" element={<LoginPage />} />
-                <Route path="register" element={<RegisterPage />} />
-                <Route
-                  path="profile"
-                  element={(
-                      <ProfilePage />
-                  )}
-                />
-              </Route>
-            </Routes>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+          <PrivateRoute>
+            <Route index element={<HomePage />} />
+            <Route path="movies" element={<MoviesPage />} />
+            <Route path="tv-shows" element={<TVShowsPage />} />
+            <Route path="details/:id" element={<DetailsPage />} />
+            <Route path="search" element={<SearchPage />} />
+            <Route path="favorites" element={<FavoritesPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+          </PrivateRoute>
+        </Route>
+      </Routes>
     </Router>
   );
 }

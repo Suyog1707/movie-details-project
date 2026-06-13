@@ -1,8 +1,32 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
+
+  const [userName, setUserName] = useState("")
+  const [password, setPassword] = useState("")
+
+  const handleSignIn = async (e) => {
+    e.preventDefault()
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/signin`,
+        {
+          userName,
+          password,
+        }
+      );
+
+      console.log(response.data)
+
+      localStorage.setItem("token", response.data.token);
+
+    } catch (error) {
+      console.error(error.response?.data);
+    }
+  }
 
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-10 lg:px-8 flex items-center justify-center">
@@ -12,17 +36,17 @@ export default function LoginPage() {
         className="w-full max-w-md glass-card p-6 sm:p-8"
       >
         <h1 className="text-2xl font-bold mb-1">Welcome back</h1>
-        <p className="text-sm text-gray-400 mb-6">Sign in to manage your TMDB movie profile.</p>
+        <p className="text-sm text-gray-400 mb-6">Sign in to manage your profile.</p>
 
         {error && <div className="mb-4 rounded-lg bg-red-500/20 text-red-200 text-sm px-3 py-2">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSignIn} className="space-y-4">
           <div>
-            <label className="block text-sm mb-1 text-gray-300">Email</label>
+            <label className="block text-sm mb-1 text-gray-300">Username</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
               required
               className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-white/10 focus:outline-none focus:border-primary"
               placeholder="you@example.com"

@@ -4,6 +4,8 @@ import SectionRow from '../components/SectionRow';
 
 export default function HomePage() {
 
+  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -15,6 +17,14 @@ export default function HomePage() {
 
       {/* Content Sections */}
       <div className="px-4 lg:px-8 -mt-10 relative z-10">
+
+        <SectionRow
+          title="▶️ Continue Watching"
+          subtitle="Pick up where you left off"
+          items={continueWatching}
+          showProgress={true}
+        />
+
         <SectionRow
           title="🔥 Trending Now"
           subtitle="What everyone is watching"
@@ -46,13 +56,6 @@ export default function HomePage() {
             items={favorites}
           />
         )}
-
-        <SectionRow
-          title="▶️ Continue Watching"
-          subtitle="Pick up where you left off"
-          items={continueWatching}
-          showProgress={true}
-        />
 
         <SectionRow
           title="🆕 Recently Added"
