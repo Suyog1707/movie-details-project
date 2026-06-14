@@ -3,8 +3,37 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiSearch, HiMenu, HiX, HiBell } from 'react-icons/hi';
 import { MdMovie } from 'react-icons/md';
+import { useSidebar } from '../context/SidebarContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const location = useLocation();
+  const { toggle } = useSidebar();
+  const navigate = useNavigate();
+  const { isAuthenticated, currentUser, logout } = useAuth();
+
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Movies', path: '/movies' },
+    { name: 'TV Shows', path: '/tv-shows' },
+    { name: 'Favorites', path: '/favorites' },
+  ];
+
+  const initials = currentUser?.displayName
+    ? currentUser.displayName
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
+      .toUpperCase()
+    : "";
+
+  const handleLogout = () => {
+    logout(),
+    navigate("/");
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
@@ -35,11 +64,10 @@ export default function Navbar() {
             <Link
               key={link.path}
               to={link.path}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                location.pathname === link.path
-                  ? 'text-white bg-white/10'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${location.pathname === link.path
+                ? 'text-white bg-white/10'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
             >
               {link.name}
             </Link>
@@ -167,11 +195,10 @@ export default function Navbar() {
           <Link
             key={link.path}
             to={link.path}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-              location.pathname === link.path
-                ? 'bg-primary text-white'
-                : 'bg-white/5 text-gray-400 hover:text-white'
-            }`}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${location.pathname === link.path
+              ? 'bg-primary text-white'
+              : 'bg-white/5 text-gray-400 hover:text-white'
+              }`}
           >
             {link.name}
           </Link>
@@ -180,21 +207,19 @@ export default function Navbar() {
           <>
             <Link
               to="/login"
-              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                location.pathname === '/login'
-                  ? 'bg-primary text-white'
-                  : 'bg-white/5 text-gray-400 hover:text-white'
-              }`}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${location.pathname === '/login'
+                ? 'bg-primary text-white'
+                : 'bg-white/5 text-gray-400 hover:text-white'
+                }`}
             >
               Login
             </Link>
             <Link
               to="/register"
-              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                location.pathname === '/register'
-                  ? 'bg-primary text-white'
-                  : 'bg-white/5 text-gray-400 hover:text-white'
-              }`}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${location.pathname === '/register'
+                ? 'bg-primary text-white'
+                : 'bg-white/5 text-gray-400 hover:text-white'
+                }`}
             >
               Register
             </Link>
@@ -202,11 +227,10 @@ export default function Navbar() {
         ) : (
           <Link
             to="/profile"
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-              location.pathname === '/profile'
-                ? 'bg-primary text-white'
-                : 'bg-white/5 text-gray-400 hover:text-white'
-            }`}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${location.pathname === '/profile'
+              ? 'bg-primary text-white'
+              : 'bg-white/5 text-gray-400 hover:text-white'
+              }`}
           >
             Profile
           </Link>

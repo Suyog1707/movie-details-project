@@ -1,7 +1,18 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
-export default function ProfilePage() {
+export default function ProfilePage({ favorites }) {
+
+  const { isAuthenticated, currentUser, logout } = useAuth();
+
+  const initials = currentUser?.displayName
+    ? currentUser.displayName
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
+      .toUpperCase()
+    : "";
 
   return (
     <div className="px-4 py-8 lg:px-8">
@@ -16,18 +27,17 @@ export default function ProfilePage() {
               {initials}
             </div>
             <div>
-              <h1 className="text-2xl font-bold">{currentUser?.name}</h1>
-              <p className="text-gray-400 text-sm">{currentUser?.email}</p>
+              <h1 className="text-2xl font-bold">{currentUser?.displayName}</h1>
               <p className="text-xs text-gray-500 mt-1">Member since {new Date(currentUser?.createdAt).toLocaleDateString()}</p>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form  className="space-y-4">
             <div>
               <label className="block text-sm mb-1 text-gray-300">Display name</label>
               <input
                 type="text"
-                value={name}
+                value={currentUser?.displayName}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-white/10 focus:outline-none focus:border-primary"
                 required
@@ -37,7 +47,7 @@ export default function ProfilePage() {
             <div>
               <label className="block text-sm mb-1 text-gray-300">Bio</label>
               <textarea
-                value={bio}
+                value={'bio'}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
                 className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-white/10 focus:outline-none focus:border-primary"
@@ -46,7 +56,7 @@ export default function ProfilePage() {
 
             <div className="flex items-center gap-3">
               <button type="submit" className="btn-primary">Save profile</button>
-              {saved && <span className="text-emerald-300 text-sm">Profile updated!</span>}
+              
             </div>
           </form>
         </div>
