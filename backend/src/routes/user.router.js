@@ -4,7 +4,7 @@ import favoriteController from "../controllers/favorite.controller.js"
 import userController from "../controllers/user.controller.js"
 import requestHandler from "../handlers/request.handler.js"
 import User from "../models/user.model.js"
-import tokenMiddleware from "../middleware/token.middleware.js"
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = express.Router()
 
@@ -49,9 +49,16 @@ router.post(
     userController.signIn
 )
 
+router.post(
+    "/signout",
+    verifyJWT,
+    requestHandler.validate,
+    userController.signOut
+)
+
 router.put(
     "/update-password",
-    tokenMiddleware.auth,
+    verifyJWT,
     body("password")
         .exists().withMessage("Password is required")
         .isLength({ min: 8 }).withMessage("Password minimum 8 charaters"),
@@ -70,21 +77,32 @@ router.put(
     userController.updatePassword
 )
 
+router.put(
+    "/update-profile",
+    verifyJWT,
+    body("displayName")
+        .exists().withMessage("displayname is required"),
+    body("bio")
+        .exists().withMessage("bio is required"),
+    requestHandler.validate,
+    userController.updateProfile
+)
+
 router.get(
     "/info",
-    tokenMiddleware.auth,
+    verifyJWT,
     userController.getInfo
 )
 
 router.get(
     "/favorites",
-    tokenMiddleware.auth,
+    verifyJWT,
     favoriteController.getFavoritesOfUser
 )
 
 router.post(
     "/favorites",
-    tokenMiddleware.auth,
+    verifyJWT,
     body("mediaType")
         .exists().withMessage("mediatype password is required")
         .custom(type => ["movie", "tv"].includes(type)).withMessage("mediatype invalid"),
@@ -97,7 +115,7 @@ router.post(
 
 router.delete(
     "/favorites/:mediaId",
-    tokenMiddleware.auth,
+    verifyJWT,
     favoriteController.removeFavorite
 )
 

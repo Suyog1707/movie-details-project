@@ -3,7 +3,7 @@ import tmdbApi from "../tmdb/tmdb.api.js"
 import User from "../models/user.model.js"
 import { Favorite } from "../models/favorite.model.js"
 import Review from "../models/review.model.js"
-import tokenMiddleware from "../middleware/token.middleware.js"
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const getList = async (req, res) => {
     try {

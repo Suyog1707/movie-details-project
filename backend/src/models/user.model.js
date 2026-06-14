@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import modelOptions from "./model.options.js";
 import crypto from "crypto"
+import jwt from "jsonwebtoken"
 
 const userSchema = new mongoose.Schema({
     userName: {
@@ -12,6 +13,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    bio: {
+        type: String,
+        default: "Nothing interesting about me",
+        required: true
+    },
     password: {
         type: String,
         required: true,
@@ -21,6 +27,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         select: false
+    },
+    refreshToken: {
+        type: String,
+        default: ""
     }
 }, modelOptions)
 
@@ -46,6 +56,31 @@ userSchema.methods.validPassword = function (password) {
     ).toString("hex")
 
     return this.password === hash
+}
+
+userSchema.methods.generateAccessToken = function () {
+    return jwt.sign(
+        {
+            username: this.username,
+            displayName: this.displayName
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN
+        }
+    )
+}
+
+userSchema.methods.generateRefreshToken = function () {
+    return jwt.sign(
+        {
+            userName: this.userName
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN
+        }
+    )
 }
 
 const User = mongoose.model("User", userSchema)
