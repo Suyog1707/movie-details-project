@@ -6,7 +6,21 @@ import { HiPlay, HiHeart, HiStar, HiCalendar } from 'react-icons/hi';
 const featured = [0, 3, 5, 7]; // indices into the data array
 
 export default function HeroBanner({ movies }) {
-  
+
+  const [current, setCurrent] = useState(0);
+
+  const featuredMovies = featured.map(i => movies[i]).filter(Boolean);
+  const movie = featuredMovies[current];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent(prev => (prev + 1) % featuredMovies.length);
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [featuredMovies.length]);
+
+  if (!movie) return null;
+
   return (
     <section className="relative w-full h-[75vh] min-h-[500px] max-h-[800px] overflow-hidden">
       {/* Backdrop Image */}
@@ -94,9 +108,8 @@ export default function HeroBanner({ movies }) {
               </Link>
               <button
                 onClick={() => toggleFavorite(movie)}
-                className={`btn-secondary flex items-center gap-2 text-sm ${
-                  isFavorite(movie.id) ? '!border-primary !text-primary' : ''
-                }`}
+                className={`btn-secondary flex items-center gap-2 text-sm ${isFavorite(movie.id) ? '!border-primary !text-primary' : ''
+                  }`}
               >
                 <HiHeart className={`w-5 h-5 ${isFavorite(movie.id) ? 'fill-primary' : ''}`} />
                 {isFavorite(movie.id) ? 'In Favorites' : 'Add to Favorites'}
@@ -117,9 +130,8 @@ export default function HeroBanner({ movies }) {
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`h-1 rounded-full transition-all duration-500 ${
-              i === current ? 'w-8 bg-primary' : 'w-3 bg-white/30 hover:bg-white/50'
-            }`}
+            className={`h-1 rounded-full transition-all duration-500 ${i === current ? 'w-8 bg-primary' : 'w-3 bg-white/30 hover:bg-white/50'
+              }`}
           />
         ))}
       </div>

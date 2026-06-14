@@ -1,8 +1,40 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSidebar } from '../context/SidebarContext';
 import { HiX } from 'react-icons/hi';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import axiosClient from '../../../backend/src/axios/axios.client';
 
 export default function Sidebar() {
+  const [genres, setGenres] = useState([])
+  const { isOpen, close, activeGenre, setActiveGenre } = useSidebar();
+  const navigate = useNavigate();
+
+  const fetchGenres = async () => {
+    const response_1 = await axiosClient.get(`${import.meta.env.VITE_BASE_URL}/api/v1/movie/genres`)
+    const response_2 = await axiosClient.get(`${import.meta.env.VITE_BASE_URL}/api/v1/tv/genres`)
+
+    setGenres(response_1.data)
+    setGenres(
+      ...genres,
+      response_2.data
+    )
+  }
+
+  useEffect(() => {
+
+    fetchGenres()
+
+    console.log(genres);
+    console.log(typeof genres);
+  }, [])
+
+  const handleGenreClick = (genre) => {
+    setActiveGenre(genre.name === activeGenre ? null : genre.name);
+    navigate(`/movies?genre=${encodeURIComponent(genre.name)}`);
+    close();
+  };
 
   return (
     <>
@@ -42,26 +74,24 @@ export default function Sidebar() {
             Genres
           </h3>
           <nav className="space-y-1">
-            {genres.map((genre, index) => (
-              <motion.button
-                key={genre.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.03 }}
-                onClick={() => handleGenreClick(genre)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium 
+            {Array.isArray(genres) &&
+              genres.map((genre, index) => (
+                <motion.button
+                  key={genre.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                  onClick={() => handleGenreClick(genre)}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium 
                   transition-all duration-200 group
                   ${activeGenre === genre.name
-                    ? 'bg-primary/20 text-primary border-l-2 border-primary'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-              >
-                <span className="text-lg group-hover:scale-125 transition-transform">
-                  {genre.icon}
-                </span>
-                <span>{genre.name}</span>
-              </motion.button>
-            ))}
+                      ? 'bg-primary/20 text-primary border-l-2 border-primary'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                >
+                  <span>{genre.name}</span>
+                </motion.button>
+              ))}
           </nav>
         </div>
 

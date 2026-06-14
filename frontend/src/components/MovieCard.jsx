@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiStar, HiHeart, HiPlay } from 'react-icons/hi';
+import { isFavorite } from '../utils/IsFavorite';
+import { toggleFavorites } from '../utils/toggleFavorite';
 
-export default function MovieCard({ movie, index = 0, showProgress = false }) {
+export default function MovieCard({ movie, index = 0, showProgress = false, favorites, fetchFavorites }) {
 
   return (
     <motion.div
@@ -58,9 +60,9 @@ export default function MovieCard({ movie, index = 0, showProgress = false }) {
       <div className="absolute top-10 right-2 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 
         transition-all duration-300 translate-y-2 group-hover:translate-y-0">
         <button
-          onClick={(e) => { e.preventDefault(); toggleFavorite(movie); }}
+          onClick={(e) => { e.preventDefault(); toggleFavorites(movie.id, favorites, fetchFavorites); }}
           className={`p-1.5 rounded-full backdrop-blur-sm transition-all duration-200 
-            ${isFavorite(movie.id) 
+            ${isFavorite( movie.id, favorites) 
               ? 'bg-primary text-white' 
               : 'bg-black/60 text-white hover:bg-primary/80'
             }`}
@@ -75,16 +77,6 @@ export default function MovieCard({ movie, index = 0, showProgress = false }) {
           </button>
         </Link>
       </div>
-
-      {/* Progress Bar (Continue Watching) */}
-      {showProgress && movie.progress && (
-        <div className="mt-1 w-full h-1 bg-dark-500 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full"
-            style={{ width: `${movie.progress}%` }}
-          />
-        </div>
-      )}
 
       {/* Title below card */}
       <div className="mt-2">
