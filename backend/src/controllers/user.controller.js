@@ -116,8 +116,8 @@ const signOut = async (req, res) => {
 
         const options = {
             httpOnly: true,
-            secure: true,
-            sameSite: "none"
+            secure: false,
+            sameSite: "lax"
         }
 
         return responseHandler.ok(res, "User sign-out successfully")
@@ -153,8 +153,8 @@ const refreshAccessToken = async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true,
-        sameSite: "none"
+        secure: false,
+        sameSite: "lax"
     }
 
     return responseHandler

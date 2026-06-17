@@ -13,17 +13,16 @@ export default function Navbar() {
   const location = useLocation();
   const { toggle } = useSidebar();
   const navigate = useNavigate();
-  const { isAuthenticated, currentUser, logout } = useAuth();
+  const { checkAuth, user, logout } = useAuth();
 
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Movies', path: '/movies' },
-    { name: 'TV Shows', path: '/tv-shows' },
     { name: 'Favorites', path: '/favorites' },
   ];
 
-  const initials = currentUser?.displayName
-    ? currentUser.displayName
+  const initials = user?.displayName
+    ? user.displayName
       .split(" ")
       .map((word) => word.charAt(0))
       .join("")
@@ -152,7 +151,7 @@ export default function Navbar() {
           </div>
 
           {/* Auth actions */}
-          {isAuthenticated ? (
+          {checkAuth ? (
             <>
               <Link
                 to="/profile"
@@ -203,7 +202,7 @@ export default function Navbar() {
             {link.name}
           </Link>
         ))}
-        {!isAuthenticated ? (
+        {!checkAuth ? (
           <>
             <Link
               to="/login"

@@ -2,44 +2,56 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
-import MoviesPage from './pages/MoviesPage';
-import TVShowsPage from './pages/TVShowsPage';
-import FavoritesPage from './pages/FavoritesPage';
+import MoviesPage from './pages/MoviesPage';import FavoritesPage from './pages/FavoritesPage';
 import DetailsPage from './pages/DetailsPage';
 import SearchPage from './pages/SearchPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import { SidebarProvider } from './context/SidebarContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { useAuth } from './context/AuthContext';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import axiosClient from '../../backend/src/axios/axios.client';
 
-function PrivateRoute({ children }) {
-  const token = localStorage.getItem("token");
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
 
-  return token ? children : <Navigate to="/login" />;
-}
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return user
+    ? children
+    : <Navigate to="/login" replace />;
+};
+
+const PublicRoute = ({ children }) => {
+  const { user } = useAuth();
+
+  return user
+    ? <Navigate to="/" replace />
+    : children;
+};
 
 function App() {
+  
+  const { checkAuth } = useAuth();
 
   const [favorites, setFavorites] = useState([])
 
   const fetchFavorites = async () => {
-    const response = await axiosClient.get(`${import.meta.env.VITE_BASE_URL}/api/v1/user/favorites`)
+    const response = await axiosClient.get(`/api/v1/user/favorites`)
     setFavorites(
       response.data
     )
   }
 
-  const { isAuthenticated } = useAuth();
-
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!checkAuth) return;
 
     fetchFavorites();
-  }, [isAuthenticated]);
+  }, [checkAuth]);
 
   return (
     <Router>
@@ -49,57 +61,49 @@ function App() {
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route index element={
-                <PrivateRoute>
+                <ProtectedRoute>
                   <HomePage
                     favorites={favorites}
                     fetchFavorites={fetchFavorites}
                   />
-                </PrivateRoute>
+                </ProtectedRoute>
               } />
               <Route path="movies" element={
-                <PrivateRoute>
+                <ProtectedRoute>
                   <MoviesPage
                     favorites={favorites}
                     fetchFavorites={fetchFavorites}
                   />
-                </PrivateRoute>
-              } />
-              <Route path="tv-shows" element={
-                <PrivateRoute>
-                  <TVShowsPage
-                    favorites={favorites}
-                    fetchFavorites={fetchFavorites}
-                  />
-                </PrivateRoute>
+                </ProtectedRoute>
               } />
               <Route path="details/:mediaId" element={
-                <PrivateRoute>
+                <ProtectedRoute>
                   <DetailsPage
                     favorites={favorites}
                     fetchFavorites={fetchFavorites}
                   />
-                </PrivateRoute>
+                </ProtectedRoute>
               } />
               <Route path="search" element={
-                <PrivateRoute>
+                <ProtectedRoute>
                   <SearchPage
                     favorites={favorites}
                     fetchFavorites={fetchFavorites}
                   />
-                </PrivateRoute>
+                </ProtectedRoute>
               } />
               <Route path="favorites" element={
-                <PrivateRoute>
+                <ProtectedRoute>
                   <FavoritesPage
                     favorites={favorites}
                     fetchFavorites={fetchFavorites}
                   />
-                </PrivateRoute>
+                </ProtectedRoute>
               } />
               <Route path="profile" element={
-                <PrivateRoute>
+                <ProtectedRoute>
                   <ProfilePage favorites={favorites} />
-                </PrivateRoute>
+                </ProtectedRoute>
               } />
             </Route>
           </Routes>

@@ -2,49 +2,60 @@ import { motion } from 'framer-motion';
 import HeroBanner from '../components/HeroBanner';
 import SectionRow from '../components/SectionRow';
 import { useState, useEffect } from 'react';
-import axiosClient from '../../../backend/src/axios/axios.client';
+import axiosClient from '../axios/axiosClient';
 
 export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
 
   const [trending, setTrending] = useState([])
   const [popularMovies, setPopularMovies] = useState([])
-  const [popularTVShows, setPopularTVShows] = useState([])
   const [topRated, setTopRated] = useState([])
   const [upcoming, setUpcoming] = useState([])
   const [allContent, setAllContent] = useState([])
 
-  const fetchData = async ({ type, category }) => {
-    const response = await axiosClient.get(`${import.meta.env.VITE_BASE_URL}/api/v1/${type}/${category}`)
-    //console.log(`${category}:-`, response.data)
-    return response.data.results
+  const fetchData = async (mediaType, mediaCategory, page) => {
+    const response = await axiosClient.get(`/api/v1/${mediaType}/${mediaCategory}`, {
+      params: {
+        page: page
+      }
+    })
+    console.log(response.data);
+
+    return response.data
   }
 
   useEffect(() => {
-    setTrending(fetchData("movie", "trending"))
-    setTrending(
-      ...trending,
-      fetchData("tv", "trending")
-    )
-    setPopularMovies(fetchData("movie", "popular"))
-    setPopularTVShows(fetchData("tv", "popular"))
-    setTopRated(fetchData("movie", "top_rated"))
-    setTopRated(
-      ...topRated,
-      fetchData("tv", "top_rated")
-    )
-    setUpcoming(fetchData("movie", "top_rated"))
-    setUpcoming(
-      ...upcoming,
-      fetchData("tv", "on_the_air")
-    )
-    setAllContent({
-      ...trending,
-      ...popularMovies,
-      ...popularTVShows,
-      ...topRated,
-      ...upcoming
-    })
-  }, [])
+    const loadData = async () => {
+      try {
+        const [
+          trendingData,
+          popularData,
+          topRatedData,
+          upcomingData,
+        ] = await Promise.all([
+          fetchData("movie", "trending", 1),
+          fetchData("movie", "popular", 1),
+          fetchData("movie", "top_rated", 1),
+          fetchData("movie", "upcoming", 1),
+        ]);
+
+        setTrending(trendingData);
+        setPopularMovies(popularData);
+        setTopRated(topRatedData);
+        setUpcoming(upcomingData);
+
+        setAllContent([
+          ...(trendingData.results || []),
+          ...(popularData.results || []),
+          ...(topRatedData.results || []),
+          ...(upcomingData.results || []),
+        ]);
+      } catch (error) {
+        console.error("Error loading movies:", error);
+      }
+    };
+
+    loadData();
+  }, []);
 
   return (
     <motion.div
@@ -65,7 +76,7 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
         <SectionRow
           title="🔥 Trending Now"
           subtitle="What everyone is watching"
-          items={trending}
+          items={trending.results || []}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
         />
@@ -73,15 +84,7 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
         <SectionRow
           title="🎬 Popular Movies"
           subtitle="Most watched this month"
-          items={popularMovies}
-          favorites={favorites}
-          fetchFavorites={fetchFavorites}
-        />
-
-        <SectionRow
-          title="📺 Popular TV Shows"
-          subtitle="Binge-worthy series"
-          items={popularTVShows}
+          items={popularMovies.results || []}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
         />
@@ -89,7 +92,7 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
         <SectionRow
           title="⭐ Top Rated"
           subtitle="Critically acclaimed content"
-          items={topRated}
+          items={topRated.results || []}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
         />
@@ -97,12 +100,12 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
         <SectionRow
           title="Upcoming"
           subtitle="What is coming next"
-          items={upcoming}
+          items={upcoming.results || []}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
         />
 
-        {favorites.length > 0 && (
+        {favorites?.length > 0 && (
           <SectionRow
             title="❤️ My Favorites"
             subtitle="Your personal collection"

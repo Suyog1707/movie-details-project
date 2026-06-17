@@ -12,8 +12,8 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const fetchGenres = async () => {
-    const response_1 = await axiosClient.get(`${import.meta.env.VITE_BASE_URL}/api/v1/movie/genres`)
-    const response_2 = await axiosClient.get(`${import.meta.env.VITE_BASE_URL}/api/v1/tv/genres`)
+    const response_1 = await axiosClient.get(`/api/v1/movie/genres`)
+    const response_2 = await axiosClient.get(`/api/v1/tv/genres`)
 
     setGenres(response_1.data)
     setGenres(

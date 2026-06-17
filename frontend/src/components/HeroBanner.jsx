@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiPlay, HiHeart, HiStar, HiCalendar } from 'react-icons/hi';
+import { isFavorite } from '../utils/IsFavorite';
+import { toggleFavorites } from '../utils/toggleFavorite';
 
 const featured = [0, 3, 5, 7]; // indices into the data array
 
-export default function HeroBanner({ movies }) {
+export default function HeroBanner({ favorites, movies, fetchFavorites }) {
 
   const [current, setCurrent] = useState(0);
 
@@ -34,7 +36,7 @@ export default function HeroBanner({ movies }) {
           className="absolute inset-0"
         >
           <img
-            src={movie.backdrop}
+            src={`${import.meta.env.VITE_IMG_URL}${movie.backdrop_path}`}
             alt={movie.title}
             className="w-full h-full object-cover"
           />
@@ -59,7 +61,7 @@ export default function HeroBanner({ movies }) {
           >
             {/* Genre Tags */}
             <div className="flex flex-wrap gap-2 mb-3">
-              {movie.genres.map(genre => (
+              {movie.genre_ids.map(genre => (
                 <span
                   key={genre}
                   className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider 
@@ -81,10 +83,10 @@ export default function HeroBanner({ movies }) {
             {/* Meta */}
             <div className="flex items-center gap-4 text-sm text-gray-300 mb-4">
               <span className="flex items-center gap-1 text-accent-gold font-semibold">
-                <HiStar className="w-4 h-4" /> {movie.rating}
+                <HiStar className="w-4 h-4" /> {movie.vote_average}
               </span>
               <span className="flex items-center gap-1">
-                <HiCalendar className="w-4 h-4" /> {movie.releaseYear}
+                <HiCalendar className="w-4 h-4" /> {movie.release_date}
               </span>
               <span>{movie.runtime}</span>
               {movie.quality?.[0] && (
@@ -106,13 +108,15 @@ export default function HeroBanner({ movies }) {
                   <HiPlay className="w-5 h-5" /> Watch Now
                 </button>
               </Link>
+              {console.log(favorites)
+              }
               <button
-                onClick={() => toggleFavorite(movie)}
-                className={`btn-secondary flex items-center gap-2 text-sm ${isFavorite(movie.id) ? '!border-primary !text-primary' : ''
+                onClick={() => toggleFavorites(movie.id, favorites, fetchFavorites)}
+                className={`btn-secondary flex items-center gap-2 text-sm ${isFavorite(movie.id, favorites) ? '!border-primary !text-primary' : ''
                   }`}
               >
-                <HiHeart className={`w-5 h-5 ${isFavorite(movie.id) ? 'fill-primary' : ''}`} />
-                {isFavorite(movie.id) ? 'In Favorites' : 'Add to Favorites'}
+                <HiHeart className={`w-5 h-5 ${isFavorite(movie.id, favorites) ? 'fill-primary' : ''}`} />
+                {isFavorite(movie.id, favorites) ? 'In Favorites' : 'Add to Favorites'}
               </button>
               <Link to={`/details/${movie.id}`}>
                 <button className="btn-secondary flex items-center gap-2 text-sm">

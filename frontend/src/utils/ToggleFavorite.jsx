@@ -10,9 +10,9 @@ export async function toggleFavorites({
   try {
     const token = localStorage.getItem("token");
 
-    const isFavorite = isFavorite({mediaId, favorites})
+    const checkFavorite = isFavorite({mediaId, favorites})
 
-    if (isFavorite) {
+    if (checkFavorite) {
       await axiosClient.delete(
         `${import.meta.env.VITE_BASE_URL}/api/v1/user/favorite/${mediaId}`,
         {
