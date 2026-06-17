@@ -10,12 +10,16 @@ export const verifyJWT = async (req, res, next) => {
             return responseHandler.unauthorize(res)
         }
 
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        const decodedToken = jwt.verify(
+            token,
+            process.env.ACCESS_TOKEN_SECRET
+        );
 
-        const user = await User.findOne({
-            userName: decodedToken.userName,
-        }).select("-password -refreshToken");
+        console.log("DECODED TOKEN:", decodedToken);
 
+        const user = await User.findOne({ userName: decodedToken.userName });
+
+        console.log("FOUND USER:", user);
         if (!user) {
             return responseHandler.badrequest(res, "Invalid Access Token")
         }

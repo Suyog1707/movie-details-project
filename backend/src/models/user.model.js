@@ -61,7 +61,8 @@ userSchema.methods.validPassword = function (password) {
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
-            username: this.username,
+            id: this._id,
+            userName: this.userName,
             displayName: this.displayName
         },
         process.env.ACCESS_TOKEN_SECRET,
@@ -74,6 +75,7 @@ userSchema.methods.generateAccessToken = function () {
 userSchema.methods.generateRefreshToken = function () {
     return jwt.sign(
         {
+            id: this._id,
             userName: this.userName
         },
         process.env.REFRESH_TOKEN_SECRET,
