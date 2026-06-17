@@ -17,7 +17,7 @@ export default function MovieCard({ movie, index = 0, showProgress = false, favo
         <div className="relative overflow-hidden rounded-xl aspect-[2/3] card-hover">
           {/* Poster */}
           <img
-            src={movie.poster}
+            src={`${import.meta.env.VITE_IMG_URL}${movie.poster_path}`}
             alt={movie.title}
             className="w-full h-full object-cover"
             loading="lazy"
@@ -29,12 +29,12 @@ export default function MovieCard({ movie, index = 0, showProgress = false, favo
             <h3 className="font-semibold text-sm leading-tight mb-1">{movie.title}</h3>
             <div className="flex items-center gap-2 text-xs text-gray-300">
               <span className="flex items-center gap-0.5 text-accent-gold">
-                <HiStar className="w-3 h-3" /> {movie.rating}
+                <HiStar className="w-3 h-3" /> {Math.round(movie.vote_average).toFixed(1)}
               </span>
-              <span>{movie.releaseYear}</span>
+              <span>{movie.release_date}</span>
             </div>
             <div className="flex items-center gap-1 mt-1.5 flex-wrap">
-              {movie.genres?.slice(0, 2).map(g => (
+              {movie.genre_ids?.slice(0, 2).map(g => (
                 <span key={g} className="px-1.5 py-0.5 text-[9px] bg-white/10 rounded-full">{g}</span>
               ))}
             </div>
@@ -51,7 +51,7 @@ export default function MovieCard({ movie, index = 0, showProgress = false, favo
           {/* Rating Badge */}
           <div className="absolute top-2 right-2 flex items-center gap-0.5 
             bg-black/70 backdrop-blur-sm rounded px-1.5 py-0.5 text-[10px] font-semibold">
-            <HiStar className="w-3 h-3 text-accent-gold" /> {movie.rating}
+            <HiStar className="w-3 h-3 text-accent-gold" /> {Math.fround(movie.vote_average).toFixed(1)}
           </div>
         </div>
       </Link>
@@ -81,7 +81,7 @@ export default function MovieCard({ movie, index = 0, showProgress = false, favo
       {/* Title below card */}
       <div className="mt-2">
         <h3 className="text-xs font-medium text-gray-200 truncate">{movie.title}</h3>
-        <p className="text-[10px] text-gray-500">{movie.releaseYear}</p>
+        <p className="text-[10px] text-gray-500">{movie.release_date}</p>
       </div>
     </motion.div>
   );

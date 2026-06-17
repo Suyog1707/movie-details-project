@@ -3,6 +3,7 @@ import HeroBanner from '../components/HeroBanner';
 import SectionRow from '../components/SectionRow';
 import { useState, useEffect } from 'react';
 import axiosClient from '../axios/axiosClient';
+import axios from 'axios';
 
 export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
 
@@ -13,12 +14,11 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
   const [allContent, setAllContent] = useState([])
 
   const fetchData = async (mediaType, mediaCategory, page) => {
-    const response = await axiosClient.get(`/api/v1/${mediaType}/${mediaCategory}`, {
+    const response = await axios.get(`${import.meta.env.VITE_TMDB_URL}/${mediaType}/${mediaCategory}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`, {
       params: {
         page: page
       }
     })
-    console.log(response.data);
 
     return response.data
   }
@@ -27,16 +27,23 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
     const loadData = async () => {
       try {
         const [
-          trendingData,
           popularData,
           topRatedData,
           upcomingData,
         ] = await Promise.all([
-          fetchData("movie", "trending", 1),
           fetchData("movie", "popular", 1),
           fetchData("movie", "top_rated", 1),
           fetchData("movie", "upcoming", 1),
         ]);
+
+        const res = await axios.get(`${import.meta.env.VITE_TMDB_URL}/trending/movie/week?api_key=${import.meta.env.VITE_TMDB_API_KEY}`)
+
+        const trendingData = res.data
+
+        console.log("Trending:", trendingData.results);
+        console.log("Popular:", popularData.results);
+        console.log("Top Rated:", topRatedData.results);
+        console.log("Upcoming:", upcomingData.results);
 
         setTrending(trendingData);
         setPopularMovies(popularData);
@@ -56,6 +63,9 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
 
     loadData();
   }, []);
+
+  console.log("allContent:", allContent);
+console.log("trending:", trending);
 
   return (
     <motion.div

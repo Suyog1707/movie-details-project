@@ -83,7 +83,7 @@ export default function HeroBanner({ favorites, movies, fetchFavorites }) {
             {/* Meta */}
             <div className="flex items-center gap-4 text-sm text-gray-300 mb-4">
               <span className="flex items-center gap-1 text-accent-gold font-semibold">
-                <HiStar className="w-4 h-4" /> {movie.vote_average}
+                <HiStar className="w-4 h-4" /> {Math.fround(movie.vote_average).toFixed(1)}
               </span>
               <span className="flex items-center gap-1">
                 <HiCalendar className="w-4 h-4" /> {movie.release_date}
