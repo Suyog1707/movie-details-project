@@ -7,6 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const isAuthenticated = !!user;
+
   const checkAuth = async () => {
     try {
       const res = await axiosClient.get("/api/v1/user/info");
@@ -66,6 +68,7 @@ export const AuthProvider = ({ children }) => {
         user,
         setUser,
         loading,
+        isAuthenticated,
         register,
         login,
         logout,

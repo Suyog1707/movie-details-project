@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiSearch, HiMenu, HiX, HiBell } from 'react-icons/hi';
@@ -13,7 +13,7 @@ export default function Navbar() {
   const location = useLocation();
   const { toggle } = useSidebar();
   const navigate = useNavigate();
-  const { checkAuth, user, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -29,8 +29,8 @@ export default function Navbar() {
       .toUpperCase()
     : "";
 
-  const handleLogout = () => {
-    logout(),
+  const handleLogout = async () => {
+    await logout()
     navigate("/");
   }
 
@@ -118,40 +118,8 @@ export default function Navbar() {
             )}
           </AnimatePresence>
 
-          {/* Notifications */}
-          <div className="relative hidden sm:block">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="btn-icon relative"
-              aria-label="Notifications"
-            >
-              <HiBell className="w-5 h-5" />
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-dark-900" />
-            </button>
-            <AnimatePresence>
-              {showNotifications && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-12 w-72 glass-card p-4 shadow-2xl"
-                >
-                  <h4 className="font-semibold text-sm mb-3">Notifications</h4>
-                  <div className="space-y-3">
-                    {['New release: Starbound now streaming', 'Your watchlist was updated', 'Neon Samurai trailer is live'].map((n, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-gray-300 hover:text-white cursor-pointer">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                        {n}
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
           {/* Auth actions */}
-          {checkAuth ? (
+          {isAuthenticated ? (
             <>
               <Link
                 to="/profile"
@@ -202,7 +170,7 @@ export default function Navbar() {
             {link.name}
           </Link>
         ))}
-        {!checkAuth ? (
+        {!isAuthenticated ? (
           <>
             <Link
               to="/login"
