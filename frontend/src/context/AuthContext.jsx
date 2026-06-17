@@ -1,101 +1,80 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { createContext, useContext, useEffect, useState } from "react";
+import axiosClient from "../axios/axiosClient";
 
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/api/v1/user/getinfo`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setCurrentUser(response.data);
-      } catch (error) {
-        localStorage.removeItem("token");
-        setCurrentUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeAuth();
-  }, []);
-
-  const register = async (data) => {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/api/v1/user/signup`,
-      data
-    );
-
-    localStorage.setItem("token", response.data.token);
-
-    const { token, ...user } = response.data;
-    setCurrentUser(user);
-
-    return response.data;
+  const checkAuth = async () => {
+    try {
+      const res = await axiosClient.get("/api/v1/user/info");
+      setUser(res.data);
+    } catch (err) {
+      console.log("CHECK AUTH ERROR:", err.response?.data);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const login = async (data) => {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/api/v1/user/signin`,
-      data
-    );
-
-    localStorage.setItem("token", response.data.token);
-
-    const { token, ...user } = response.data;
-    setCurrentUser(user);
-
-    return response.data;
+    try {
+      const response = await axiosClient.post(
+        "/api/v1/user/signin",
+        data
+      );
+      setUser(response.data);
+      return response.data;
+    } catch (err) {
+      setUser(null);
+      throw err;
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setCurrentUser(null);
+  const register = async (data) => {
+    try {
+      const res = await axiosClient.post(
+        "/api/v1/user/signup",
+        data
+      );
+
+      return res;
+    } catch (err) {
+      setUser(null);
+      throw err;
+    }
   };
 
-  const value = useMemo(
-    () => ({
-      currentUser,
-      isAuthenticated: !!currentUser,
-      loading,
-      login,
-      register,
-      logout,
-    }),
-    [currentUser, loading]
-  );
+  const logout = async () => {
+    try {
+      await axiosClient.post("/api/v1/user/signout");
+      setUser(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        loading,
+        register,
+        login,
+        logout,
+        checkAuth,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-}
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-
-  return context;
 };
+
+export const useAuth = () => useContext(AuthContext);

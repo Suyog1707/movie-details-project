@@ -120,9 +120,11 @@ const signOut = async (req, res) => {
             sameSite: "lax"
         }
 
-        return responseHandler.ok(res, "User sign-out successfully")
-            .clearCookie("accessToken", options)
-            .clearCookie("refreshToken", options)
+        return responseHandler.ok(
+            res.clearCookie("accessToken", options)
+                .clearCookie("refreshToken", options),
+            "User sign-out successfully"
+        )
 
     } catch (error) {
         console.error(error)

@@ -1,18 +1,34 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import axiosClient from '../axios/axiosClient';
 
 export default function ProfilePage({ favorites }) {
 
-  const { isAuthenticated, currentUser, logout } = useAuth();
+  const { user } = useAuth();
+  
+  const [name, setName] = useState(
+    user?.displayName || ""
+  );
 
-  const initials = currentUser?.displayName
-    ? currentUser.displayName
+  const [bio, setBio] = useState(
+    user?.bio || ""
+  );
+
+  const initials = user?.displayName
+    ? user.displayName
       .split(" ")
       .map((word) => word.charAt(0))
       .join("")
       .toUpperCase()
     : "";
+
+    const handleSubmit = async () => {
+      const response = await axiosClient.put(`/api/v1/user/update-profile`,{
+        displayName: name,
+        bio: bio
+      })
+    }
 
   return (
     <div className="px-4 py-8 lg:px-8">
@@ -27,17 +43,17 @@ export default function ProfilePage({ favorites }) {
               {initials}
             </div>
             <div>
-              <h1 className="text-2xl font-bold">{currentUser?.displayName}</h1>
-              <p className="text-xs text-gray-500 mt-1">Member since {new Date(currentUser?.createdAt).toLocaleDateString()}</p>
+              <h1 className="text-2xl font-bold">{user?.displayName}</h1>
+              <p className="text-xs text-gray-500 mt-1">Member since {new Date(user?.createdAt).toLocaleDateString()}</p>
             </div>
           </div>
 
-          <form  className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm mb-1 text-gray-300">Display name</label>
               <input
                 type="text"
-                value={currentUser?.displayName}
+                defaultValue={user.displayName}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-white/10 focus:outline-none focus:border-primary"
                 required
@@ -47,7 +63,7 @@ export default function ProfilePage({ favorites }) {
             <div>
               <label className="block text-sm mb-1 text-gray-300">Bio</label>
               <textarea
-                value={'bio'}
+                defaultValue={user.bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
                 className="w-full px-3 py-2 rounded-lg bg-dark-600 border border-white/10 focus:outline-none focus:border-primary"
@@ -56,7 +72,7 @@ export default function ProfilePage({ favorites }) {
 
             <div className="flex items-center gap-3">
               <button type="submit" className="btn-primary">Save profile</button>
-              
+
             </div>
           </form>
         </div>
@@ -64,7 +80,7 @@ export default function ProfilePage({ favorites }) {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="glass-card p-5">
             <p className="text-sm text-gray-400">Favorites</p>
-            <p className="text-2xl font-bold mt-1">{favorites.length}</p>
+            <p className="text-2xl font-bold mt-1">{favorites?.length}</p>
           </div>
           <div className="glass-card p-5">
             <p className="text-sm text-gray-400">TMDB Source</p>

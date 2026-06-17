@@ -18,7 +18,7 @@ axiosClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        await axiosClient.post("/user/refresh-token");
+        await axiosClient.post("/api/v1/user/refresh-");
 
         return axiosClient(originalRequest);
       } catch (refreshError) {

@@ -27,9 +27,10 @@ const handleSignUp = async (e) => {
       confirmPassword,
     });
 
-    navigate("/");
+    navigate("/login");
   } catch (error) {
     setError(error.response?.data?.message || "Registration failed");
+    console.error(error)
   }
 };
 

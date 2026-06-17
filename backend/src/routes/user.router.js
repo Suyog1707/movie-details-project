@@ -31,8 +31,7 @@ router.post(
             return true
         }),
     body("displayName")
-        .exists().withMessage("Display name is required")
-        .isLength({ min: 8 }).withMessage("Display name minimum 8 charaters"),
+        .exists().withMessage("Display name is required"),
     requestHandler.validate,
     userController.signUp
 )
@@ -47,6 +46,13 @@ router.post(
         .isLength({ min: 8 }).withMessage("Password minimum 8 charaters"),
     requestHandler.validate,
     userController.signIn
+)
+
+router.post(
+    "/refresh-token",
+    verifyJWT,
+    requestHandler.validate,
+    userController.refreshAccessToken
 )
 
 router.post(

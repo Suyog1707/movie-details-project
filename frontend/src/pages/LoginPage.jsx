@@ -2,15 +2,14 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const {login} = useAuth()
 
 const handleSignIn = async (e) => {
   e.preventDefault();

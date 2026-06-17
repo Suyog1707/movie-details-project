@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
-import MoviesPage from './pages/MoviesPage';import FavoritesPage from './pages/FavoritesPage';
+import MoviesPage from './pages/MoviesPage'; import FavoritesPage from './pages/FavoritesPage';
 import DetailsPage from './pages/DetailsPage';
 import SearchPage from './pages/SearchPage';
 import LoginPage from './pages/LoginPage';
@@ -35,7 +35,7 @@ const PublicRoute = ({ children }) => {
 };
 
 function App() {
-  
+
   const { checkAuth } = useAuth();
 
   const [favorites, setFavorites] = useState([])
@@ -55,59 +55,66 @@ function App() {
 
   return (
     <Router>
-        <SidebarProvider>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route path="login" element={<LoginPage />} />
-              <Route path="register" element={<RegisterPage />} />
-              <Route index element={
-                <ProtectedRoute>
-                  <HomePage
-                    favorites={favorites}
-                    fetchFavorites={fetchFavorites}
-                  />
-                </ProtectedRoute>
-              } />
-              <Route path="movies" element={
-                <ProtectedRoute>
-                  <MoviesPage
-                    favorites={favorites}
-                    fetchFavorites={fetchFavorites}
-                  />
-                </ProtectedRoute>
-              } />
-              <Route path="details/:mediaId" element={
-                <ProtectedRoute>
-                  <DetailsPage
-                    favorites={favorites}
-                    fetchFavorites={fetchFavorites}
-                  />
-                </ProtectedRoute>
-              } />
-              <Route path="search" element={
-                <ProtectedRoute>
-                  <SearchPage
-                    favorites={favorites}
-                    fetchFavorites={fetchFavorites}
-                  />
-                </ProtectedRoute>
-              } />
-              <Route path="favorites" element={
-                <ProtectedRoute>
-                  <FavoritesPage
-                    favorites={favorites}
-                    fetchFavorites={fetchFavorites}
-                  />
-                </ProtectedRoute>
-              } />
-              <Route path="profile" element={
-                <ProtectedRoute>
-                  <ProfilePage favorites={favorites} />
-                </ProtectedRoute>
-              } />
-            </Route>
-          </Routes>
-        </SidebarProvider>
+      <SidebarProvider>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route path="login" element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            } />
+            <Route path="register" element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            } />
+            <Route index element={
+              <HomePage
+                favorites={favorites}
+                fetchFavorites={fetchFavorites}
+              />
+            } />
+            <Route path="movies" element={
+              <ProtectedRoute>
+                <MoviesPage
+                  favorites={favorites}
+                  fetchFavorites={fetchFavorites}
+                />
+              </ProtectedRoute>
+            } />
+            <Route path="details/:mediaId" element={
+              <ProtectedRoute>
+                <DetailsPage
+                  favorites={favorites}
+                  fetchFavorites={fetchFavorites}
+                />
+              </ProtectedRoute>
+            } />
+            <Route path="search" element={
+              <ProtectedRoute>
+                <SearchPage
+                  favorites={favorites}
+                  fetchFavorites={fetchFavorites}
+                />
+              </ProtectedRoute>
+            } />
+            <Route path="favorites" element={
+              <ProtectedRoute>
+                <FavoritesPage
+                  favorites={favorites}
+                  fetchFavorites={fetchFavorites}
+                />
+              </ProtectedRoute>
+            } />
+            <Route path="profile" element={
+              <ProtectedRoute>
+                <ProfilePage favorites={favorites} />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={console.log("not found")} />
+          </Route>
+        </Routes>
+      </SidebarProvider>
     </Router>
   );
 }
