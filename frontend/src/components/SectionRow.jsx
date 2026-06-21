@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import MovieCard from './MovieCard';
 
-export default function SectionRow({ title, subtitle, items, showProgress = false, favorites, fetchFavorites }) {
+export default function SectionRow({ title, subtitle, items, showProgress = false, genres, favorites, fetchFavorites }) {
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
@@ -62,6 +62,7 @@ export default function SectionRow({ title, subtitle, items, showProgress = fals
             <div key={item.id} className="snap-start">
               <MovieCard
                 movie={item}
+                genres={genres}
                 index={index}
                 showProgress={showProgress}
                 favorites={favorites}

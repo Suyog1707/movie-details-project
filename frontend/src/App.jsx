@@ -13,6 +13,7 @@ import { useAuth } from './context/AuthContext';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import axiosClient from './axios/axiosClient';
+import axios from 'axios';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -49,8 +50,8 @@ function App() {
   }
 
   const fetchGenres = async () => {
-    const response = await axiosClient.get(`/api/v1/movie/genres`)
-    setGenres(response.data)
+    const response = await axios.get(`${import.meta.env.VITE_TMDB_URL}/genre/movie/list?api_key=${import.meta.env.VITE_TMDB_API_KEY}`)
+    setGenres(response.data.genres)
   }
 
   useEffect(() => {
@@ -60,13 +61,15 @@ function App() {
     fetchGenres()
   }, [checkAuth]);
 
-  console.log(genres)
-
   return (
     <Router>
       <SidebarProvider>
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={
+            <Layout
+              genres={genres}
+            />
+          }>
             <Route path="login" element={
               <PublicRoute>
                 <LoginPage />
@@ -80,6 +83,7 @@ function App() {
             <Route index element={
               <ProtectedRoute>
                 <HomePage
+                  genres={genres}
                   favorites={favorites}
                   fetchFavorites={fetchFavorites}
                 />
@@ -88,6 +92,7 @@ function App() {
             <Route path="movies" element={
               <ProtectedRoute>
                 <MoviesPage
+                  genres={genres}
                   favorites={favorites}
                   fetchFavorites={fetchFavorites}
                 />
@@ -104,6 +109,7 @@ function App() {
             <Route path="search" element={
               <ProtectedRoute>
                 <SearchPage
+                  genres={genres}
                   favorites={favorites}
                   fetchFavorites={fetchFavorites}
                 />

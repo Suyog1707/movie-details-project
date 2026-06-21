@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import axiosClient from '../axios/axiosClient';
 import axios from 'axios';
 
-export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
+export default function HomePage({ favorites, genres, fetchFavorites }) {
 
   const [trending, setTrending] = useState([])
   const [popularMovies, setPopularMovies] = useState([])
@@ -68,6 +68,7 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
       {/* Hero Banner */}
       <HeroBanner
         movies={allContent}
+        genres={genres}
         favorites={favorites}
         fetchFavorites={fetchFavorites}
       />
@@ -79,6 +80,7 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
           title="🔥 Trending Now"
           subtitle="What everyone is watching"
           items={trending.results || []}
+          genres={genres}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
         />
@@ -87,6 +89,7 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
           title="🎬 Popular Movies"
           subtitle="Most watched this month"
           items={popularMovies.results || []}
+          genres={genres}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
         />
@@ -95,6 +98,7 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
           title="⭐ Top Rated"
           subtitle="Critically acclaimed content"
           items={topRated.results || []}
+          genres={genres}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
         />
@@ -103,6 +107,7 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
           title="Upcoming"
           subtitle="What is coming next"
           items={upcoming.results || []}
+          genres={genres}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
         />
@@ -112,6 +117,7 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
             title="❤️ My Favorites"
             subtitle="Your personal collection"
             items={favorites}
+            genres={genres}
             favorites={favorites}
             fetchFavorites={fetchFavorites}
           />

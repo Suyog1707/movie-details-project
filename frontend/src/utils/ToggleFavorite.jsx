@@ -8,8 +8,6 @@ export async function toggleFavorites(
 ) {
   try {
     const checkFavorite = isFavorite(mediaId, favorites)
-    console.log("MEDIA ID:", mediaId);
-    console.log("PAYLOAD:", { mediaId });
 
     if (checkFavorite) {
       await axiosClient.delete(

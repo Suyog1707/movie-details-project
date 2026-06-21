@@ -4,8 +4,12 @@ import { HiStar, HiHeart, HiPlay } from 'react-icons/hi';
 import { isFavorite } from '../utils/IsFavorite';
 import { toggleFavorites } from '../utils/toggleFavorite';
 
-export default function MovieCard({ movie, index = 0, showProgress = false, favorites, fetchFavorites }) {
+export default function MovieCard({ movie, index = 0, showProgress = false, genres, favorites, fetchFavorites }) {
 
+  const genreMap = genres?.reduce((acc, genre) => {
+    acc[genre.id] = genre.name;
+    return acc;
+  }, {});
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -34,8 +38,10 @@ export default function MovieCard({ movie, index = 0, showProgress = false, favo
               <span>{movie.release_date}</span>
             </div>
             <div className="flex items-center gap-1 mt-1.5 flex-wrap">
-              {movie.genre_ids?.slice(0, 2).map(g => (
-                <span key={g} className="px-1.5 py-0.5 text-[9px] bg-white/10 rounded-full">{g}</span>
+              {movie.genre_ids?.slice(0, 2).map(id => (
+                <span key={id} className="px-1.5 py-0.5 text-[9px] bg-white/10 rounded-full">
+                  {genreMap[id]}
+                </span>
               ))}
             </div>
           </div>
@@ -62,8 +68,8 @@ export default function MovieCard({ movie, index = 0, showProgress = false, favo
         <button
           onClick={(e) => { e.preventDefault(); toggleFavorites(movie.id, favorites, fetchFavorites); }}
           className={`p-1.5 rounded-full backdrop-blur-sm transition-all duration-200 
-            ${isFavorite( movie.id, favorites) 
-              ? 'bg-primary text-white' 
+            ${isFavorite(movie.id, favorites)
+              ? 'bg-primary text-white'
               : 'bg-black/60 text-white hover:bg-primary/80'
             }`}
           aria-label="Toggle favorite"

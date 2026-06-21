@@ -86,7 +86,6 @@ const getFavoritesOfUser = async (req, res) => {
 
         const favoriteMovies = await Promise.all(
             favorites.map(async (favorite) => {
-
                 try {
                     const mediaType = "movie"
                     const mediaId = favorite.mediaId
@@ -96,39 +95,6 @@ const getFavoritesOfUser = async (req, res) => {
                     const media = await retryRequest(
                         () => tmdbApi.mediaDetail(params)
                     );
-
-                    if (!media) {
-                        console.log("MEDIA NOT FOUND:", mediaId);
-                        return null;
-                    }
-
-                    media.credits = await retryRequest(
-                        () => tmdbApi.mediaCredits(params)
-                    );
-
-                    media.videos = await retryRequest(
-                        () => tmdbApi.mediaVideos(params)
-                    );
-
-                    const recommend = await retryRequest(
-                        () => tmdbApi.mediaRecommend(params)
-                    );
-
-                    media.recommend = recommend?.results || [];
-
-                    media.image = await retryRequest(
-                        () => tmdbApi.mediaImages(params)
-                    );
-
-                    const user = await User.findById(req.user.id)
-
-                    if (user) {
-                        const isFavorite = await Favorite.findOne({ user: user.id, mediaId })
-
-                        media.isFavorite = isFavorite !== null
-                    }
-
-                    media.reviews = await Review.find({ mediaId }).populate("user").sort("-createdAt")
 
                     return media
 
@@ -140,12 +106,6 @@ const getFavoritesOfUser = async (req, res) => {
         );
 
         const filteredMovies = favoriteMovies.filter(Boolean);
-
-        console.log("Favorites in DB:", favorites.length);
-        console.log(
-            "Fetched from TMDB:",
-            filteredMovies.length
-        );
 
         return responseHandler.ok(res, filteredMovies);
 

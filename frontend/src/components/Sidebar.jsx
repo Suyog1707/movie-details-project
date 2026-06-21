@@ -6,29 +6,11 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import axiosClient from '../../../backend/src/axios/axios.client';
 
-export default function Sidebar() {
-  const [genres, setGenres] = useState([])
+export default function Sidebar({genres}) {
   const { isOpen, close, activeGenre, setActiveGenre } = useSidebar();
   const navigate = useNavigate();
 
-  const fetchGenres = async () => {
-    const response_1 = await axiosClient.get(`/api/v1/movie/genres`)
-    const response_2 = await axiosClient.get(`/api/v1/tv/genres`)
-
-    setGenres(response_1.data)
-    setGenres(
-      ...genres,
-      response_2.data
-    )
-  }
-
-  useEffect(() => {
-
-    fetchGenres()
-
-    console.log(genres);
-    console.log(typeof genres);
-  }, [])
+  console.log();
 
   const handleGenreClick = (genre) => {
     setActiveGenre(genre.name === activeGenre ? null : genre.name);
@@ -69,13 +51,13 @@ export default function Sidebar() {
         </div>
 
         {/* Genres */}
-        <div className="p-4">
+        <div className="p-4 mb-14">
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
             Genres
           </h3>
           <nav className="space-y-1">
-            {Array.isArray(genres) &&
-              genres.map((genre, index) => (
+            {Array.isArray(genres?.genres) &&
+              genres?.genres.map((genre, index) => (
                 <motion.button
                   key={genre.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -93,17 +75,6 @@ export default function Sidebar() {
                 </motion.button>
               ))}
           </nav>
-        </div>
-
-        {/* Bottom section */}
-        <div className="p-4 mb-14 border-t border-white/5">
-          <div className="glass-card p-4 text-center">
-            <p className="text-xs text-gray-400 mb-2">Upgrade to Premium</p>
-            <p className="text-[10px] text-gray-500 mb-3">Get 4K streaming + no ads</p>
-            <button className="btn-primary text-xs py-2 px-4 w-full">
-              Upgrade Now
-            </button>
-          </div>
         </div>
       </aside>
     </>

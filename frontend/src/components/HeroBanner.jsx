@@ -7,12 +7,17 @@ import { toggleFavorites } from '../utils/toggleFavorite';
 
 const featured = [0, 3, 5, 7]; // indices into the data array
 
-export default function HeroBanner({ favorites, movies, fetchFavorites }) {
+export default function HeroBanner({ genres, favorites, movies, fetchFavorites }) {
 
   const [current, setCurrent] = useState(0);
 
   const featuredMovies = featured.map(i => movies[i]).filter(Boolean);
   const movie = featuredMovies[current];
+
+  const genreMap = genres?.reduce((acc, genre) => {
+    acc[genre.id] = genre.name;
+    return acc;
+  }, {});
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -61,13 +66,9 @@ export default function HeroBanner({ favorites, movies, fetchFavorites }) {
           >
             {/* Genre Tags */}
             <div className="flex flex-wrap gap-2 mb-3">
-              {movie.genre_ids.map(genre => (
-                <span
-                  key={genre}
-                  className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider 
-                    bg-white/10 backdrop-blur-sm rounded-full border border-white/10"
-                >
-                  {genre}
+              {movie.genre_ids?.slice(0, 2).map(id => (
+                <span key={id} className="px-1.5 py-0.5 text-[9px] bg-white/10 rounded-full">
+                  {genreMap[id]}
                 </span>
               ))}
             </div>
