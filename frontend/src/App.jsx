@@ -39,6 +39,7 @@ function App() {
   const { checkAuth } = useAuth();
 
   const [favorites, setFavorites] = useState([])
+  const [genres, setGenres] = useState([])
 
   const fetchFavorites = async () => {
     const response = await axiosClient.get(`/api/v1/user/favorites`)
@@ -47,13 +48,19 @@ function App() {
     )
   }
 
+  const fetchGenres = async () => {
+    const response = await axiosClient.get(`/api/v1/movie/genres`)
+    setGenres(response.data)
+  }
+
   useEffect(() => {
     if (!checkAuth) return;
 
     fetchFavorites();
+    fetchGenres()
   }, [checkAuth]);
 
-  console.log(favorites)
+  console.log(genres)
 
   return (
     <Router>

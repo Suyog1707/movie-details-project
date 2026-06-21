@@ -2,7 +2,8 @@ import axios from "axios"
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
-  withCredentials: true
+  withCredentials: true,
+  timeout: 10000
 });
 
 axiosClient.interceptors.response.use(

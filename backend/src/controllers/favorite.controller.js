@@ -49,6 +49,32 @@ const removeFavorite = async (req, res) => {
     }
 }
 
+const retryRequest = async (
+    requestFn,
+    retries = 3,
+    delay = 1000
+) => {
+    try {
+        return await requestFn();
+    } catch (error) {
+        if (retries <= 0) throw error;
+
+        console.log(
+            `Retrying request... (${retries} attempts left)`
+        );
+
+        await new Promise(resolve =>
+            setTimeout(resolve, delay)
+        );
+
+        return retryRequest(
+            requestFn,
+            retries - 1,
+            delay
+        );
+    }
+};
+
 const getFavoritesOfUser = async (req, res) => {
     try {
         const favorites = await Favorite.find({
@@ -65,23 +91,34 @@ const getFavoritesOfUser = async (req, res) => {
                     const mediaType = "movie"
                     const mediaId = favorite.mediaId
 
-                    console.log("Favorite:", favorite);
-                    console.log("MediaId:", favorite.mediaId);
                     const params = { mediaType, mediaId }
 
-                    const media = await tmdbApi.mediaDetail(params)
+                    const media = await retryRequest(
+                        () => tmdbApi.mediaDetail(params)
+                    );
 
-                    const credits = await tmdbApi.mediaCredits(params)
-                    media.credits = credits
+                    if (!media) {
+                        console.log("MEDIA NOT FOUND:", mediaId);
+                        return null;
+                    }
 
-                    const videos = await tmdbApi.mediaVideos(params)
-                    media.videos = videos
+                    media.credits = await retryRequest(
+                        () => tmdbApi.mediaCredits(params)
+                    );
 
-                    const recommend = await tmdbApi.mediaRecommend(params)
-                    media.recommend = recommend.results
+                    media.videos = await retryRequest(
+                        () => tmdbApi.mediaVideos(params)
+                    );
 
-                    const image = await tmdbApi.mediaImages(params)
-                    media.image = image
+                    const recommend = await retryRequest(
+                        () => tmdbApi.mediaRecommend(params)
+                    );
+
+                    media.recommend = recommend?.results || [];
+
+                    media.image = await retryRequest(
+                        () => tmdbApi.mediaImages(params)
+                    );
 
                     const user = await User.findById(req.user.id)
 
