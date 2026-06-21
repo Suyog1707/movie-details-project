@@ -69,16 +69,12 @@ const getDetail = async (req, res) => {
 
         media.image = await tmdbApi.mediaImages(params)
 
-        const tokenDecoded = tokenMiddleware.tokenDecode(req)
+        const user = await User.findById(req.user.id)
 
-        if (tokenDecoded) {
-            const user = await User.findById(tokenDecoded.data)
+        if (user) {
+            const isFavorite = await Favorite.findOne({ user: user.id, mediaId })
 
-            if (user) {
-                const isFavorite = await Favorite.findOne({ user: user.id, mediaId })
-
-                media.isFavorite = isFavorite !== null
-            }
+            media.isFavorite = isFavorite !== null
         }
 
         media.reviews = await Review.find({ mediaId }).populate("user").sort("-createdAt")

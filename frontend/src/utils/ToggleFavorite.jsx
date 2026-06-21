@@ -1,35 +1,24 @@
-import axios from "axios";
-import axiosClient from "../../../backend/src/axios/axios.client";
+import axiosClient from "../axios/axiosClient.jsx";
 import { isFavorite } from "./IsFavorite";
 
-export async function toggleFavorites({
+export async function toggleFavorites(
   mediaId,
   favorites,
   fetchFavorites,
-}) {
+) {
   try {
-    const token = localStorage.getItem("token");
-
-    const checkFavorite = isFavorite({mediaId, favorites})
+    const checkFavorite = isFavorite(mediaId, favorites)
+    console.log("MEDIA ID:", mediaId);
+    console.log("PAYLOAD:", { mediaId });
 
     if (checkFavorite) {
       await axiosClient.delete(
-        `${import.meta.env.VITE_BASE_URL}/api/v1/user/favorite/${mediaId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/favorites/${mediaId}`
       );
     } else {
       await axiosClient.post(
         `${import.meta.env.VITE_BASE_URL}/api/v1/user/favorites`,
-        { mediaId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { mediaId }
       );
     }
 

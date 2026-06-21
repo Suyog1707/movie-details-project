@@ -108,8 +108,6 @@ export default function HeroBanner({ favorites, movies, fetchFavorites }) {
                   <HiPlay className="w-5 h-5" /> Watch Now
                 </button>
               </Link>
-              {console.log(favorites)
-              }
               <button
                 onClick={() => toggleFavorites(movie.id, favorites, fetchFavorites)}
                 className={`btn-secondary flex items-center gap-2 text-sm ${isFavorite(movie.id, favorites) ? '!border-primary !text-primary' : ''

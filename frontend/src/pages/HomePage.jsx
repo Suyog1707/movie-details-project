@@ -40,11 +40,6 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
 
         const trendingData = res.data
 
-        console.log("Trending:", trendingData.results);
-        console.log("Popular:", popularData.results);
-        console.log("Top Rated:", topRatedData.results);
-        console.log("Upcoming:", upcomingData.results);
-
         setTrending(trendingData);
         setPopularMovies(popularData);
         setTopRated(topRatedData);
@@ -63,9 +58,6 @@ export default function HomePage({ favorites, setFavorites, fetchFavorites }) {
 
     loadData();
   }, []);
-
-  console.log("allContent:", allContent);
-console.log("trending:", trending);
 
   return (
     <motion.div

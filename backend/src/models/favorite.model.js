@@ -12,10 +12,6 @@ const favoriteSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  mediaType: {
-    type: String,
-    required: true
-  },
 },
   modelOptions)
 

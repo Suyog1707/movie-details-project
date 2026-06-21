@@ -1,29 +1,32 @@
 import responseHandler from "../handlers/response.handler.js";
 import { Favorite } from "../models/favorite.model.js"
+import tmdbApi from "../tmdb/tmdb.api.js";
+import Review from "../models/review.model.js";
+import User from "../models/user.model.js";
 
 const addFavorite = async (req, res) => {
     try {
         const isFavorite = await Favorite.findOne({
             user: req.user.id,
             mediaId: req.body.mediaId
-        })
+        });
 
         if (isFavorite)
-            return responseHandler.ok(res, isFavorite)
+            return responseHandler.ok(res, isFavorite);
 
         const favorite = new Favorite({
             user: req.user.id,
             ...req.body
-        })
+        });
 
-        await favorite.save()
+        await favorite.save();
 
-        responseHandler.created(res, favorite)
+        responseHandler.created(res, favorite);
     } catch (error) {
-        console.error(error)
-        responseHandler.error(res)
+        console.error("ADD FAVORITE ERROR:", error);
+        responseHandler.error(res);
     }
-}
+};
 
 const removeFavorite = async (req, res) => {
     try {
@@ -31,7 +34,7 @@ const removeFavorite = async (req, res) => {
 
         const favorite = await Favorite.findOne({
             user: req.user.id,
-            mediaId
+            mediaId: Number(mediaId)
         })
 
         if (!favorite)
@@ -48,16 +51,77 @@ const removeFavorite = async (req, res) => {
 
 const getFavoritesOfUser = async (req, res) => {
     try {
-        const favorite = await Favorite.find({ user: req.user.id }).sort("-createdAt")
+        const favorites = await Favorite.find({
+            user: req.user.id
+        }).sort("-createdAt");
 
-        if (!favorite) return responseHandler.notFound(res, "favorites not found")
+        if (!favorites.length)
+            return responseHandler.ok(res, []);
 
-        return responseHandler.ok(res, favorite)
-    } catch (error) {
-        console.error(error)
-        responseHandler.error(res)
+        const favoriteMovies = await Promise.all(
+            favorites.map(async (favorite) => {
+
+                try {
+                    const mediaType = "movie"
+                    const mediaId = favorite.mediaId
+
+                    console.log("Favorite:", favorite);
+                    console.log("MediaId:", favorite.mediaId);
+                    const params = { mediaType, mediaId }
+
+                    const media = await tmdbApi.mediaDetail(params)
+
+                    const credits = await tmdbApi.mediaCredits(params)
+                    media.credits = credits
+
+                    const videos = await tmdbApi.mediaVideos(params)
+                    media.videos = videos
+
+                    const recommend = await tmdbApi.mediaRecommend(params)
+                    media.recommend = recommend.results
+
+                    const image = await tmdbApi.mediaImages(params)
+                    media.image = image
+
+                    const user = await User.findById(req.user.id)
+
+                    if (user) {
+                        const isFavorite = await Favorite.findOne({ user: user.id, mediaId })
+
+                        media.isFavorite = isFavorite !== null
+                    }
+
+                    media.reviews = await Review.find({ mediaId }).populate("user").sort("-createdAt")
+
+                    return media
+
+                } catch (err) {
+                    console.log(err.response?.data || err.message);
+                    return null;
+                }
+            })
+        );
+
+        const filteredMovies = favoriteMovies.filter(Boolean);
+
+        console.log("Favorites in DB:", favorites.length);
+        console.log(
+            "Fetched from TMDB:",
+            filteredMovies.length
+        );
+
+        return responseHandler.ok(res, filteredMovies);
+
+    } catch (err) {
+        console.log(
+            "FAILED ID:",
+            favorite.mediaId,
+            err.code,
+            err.message
+        );
+        return null;
     }
-}
+};
 
 export default {
     addFavorite,

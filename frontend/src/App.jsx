@@ -12,7 +12,7 @@ import { SidebarProvider } from './context/SidebarContext';
 import { useAuth } from './context/AuthContext';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import axiosClient from '../../backend/src/axios/axios.client';
+import axiosClient from './axios/axiosClient';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -53,6 +53,8 @@ function App() {
     fetchFavorites();
   }, [checkAuth]);
 
+  console.log(favorites)
+
   return (
     <Router>
       <SidebarProvider>
@@ -69,10 +71,12 @@ function App() {
               </PublicRoute>
             } />
             <Route index element={
-              <HomePage
-                favorites={favorites}
-                fetchFavorites={fetchFavorites}
-              />
+              <ProtectedRoute>
+                <HomePage
+                  favorites={favorites}
+                  fetchFavorites={fetchFavorites}
+                />
+              </ProtectedRoute>
             } />
             <Route path="movies" element={
               <ProtectedRoute>
@@ -111,7 +115,6 @@ function App() {
                 <ProfilePage favorites={favorites} />
               </ProtectedRoute>
             } />
-            <Route path="*" element={console.log("not found")} />
           </Route>
         </Routes>
       </SidebarProvider>

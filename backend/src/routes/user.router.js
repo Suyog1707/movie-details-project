@@ -109,9 +109,6 @@ router.get(
 router.post(
     "/favorites",
     verifyJWT,
-    body("mediaType")
-        .exists().withMessage("mediatype password is required")
-        .custom(type => ["movie", "tv"].includes(type)).withMessage("mediatype invalid"),
     body("mediaId")
         .exists().withMessage("mediaId is required")
         .isLength({ min: 1 }).withMessage("mediaId can not be empty"),
