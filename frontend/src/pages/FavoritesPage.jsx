@@ -1,9 +1,63 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiFilter, HiTrash } from 'react-icons/hi';
+import { useSearchParams } from 'react-router-dom';
 import MovieCard from '../components/MovieCard';
 
-export default function FavoritesPage() {
+export default function FavoritesPage({ genres, favorites, fetchFavorites }) {
+
+  const [searchParams] = useSearchParams();
+  const genreFilter = searchParams.get('genre');
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('added');
+  const [selectedGenre, setSelectedGenre] = useState(genreFilter || 'All');
+
+  const filtered = useMemo(() => {
+    let result = [...favorites];
+
+    if (selectedGenre !== "All") {
+      const genreObj = genres.find(
+        g => g.name === selectedGenre
+      );
+
+      result = result.filter(movie =>
+        movie.genre_ids?.includes(genreObj?.id)
+      );
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+
+      result = result.filter(movie =>
+        movie.title?.toLowerCase().includes(q)
+      );
+    }
+
+    if (sortBy === "added") {
+      result.sort(
+        (a, b) =>
+          new Date(b.createdAt) -
+          new Date(a.createdAt)
+      );
+    }
+    else if (sortBy === "rating") {
+      result.sort(
+        (a, b) => b.vote_average - a.vote_average
+      );
+    } else if (sortBy === "year") {
+      result.sort(
+        (a, b) =>
+          new Date(b.release_date) -
+          new Date(a.release_date)
+      );
+    } else if (sortBy === "title") {
+      result.sort((a, b) =>
+        a.title.localeCompare(b.title)
+      );
+    }
+
+    return result;
+  }, [favorites, genres, selectedGenre, search, sortBy]);
 
   return (
     <motion.div
@@ -40,22 +94,20 @@ export default function FavoritesPage() {
           <button
             onClick={() => setSelectedGenre('All')}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all 
-              ${selectedGenre === 'All' ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+            ${selectedGenre === 'All' ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
           >
             All
           </button>
-          {genres
-            .filter(g => favorites.some(f => f.genres.includes(g.name)))
-            .map(g => (
-              <button
-                key={g.id}
-                onClick={() => setSelectedGenre(g.name)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all 
-                  ${selectedGenre === g.name ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
-              >
-                {g.icon} {g.name}
-              </button>
-            ))}
+          {genres.map(g => (
+            <button
+              key={g.id}
+              onClick={() => setSelectedGenre(g.name)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all 
+              ${selectedGenre === g.name ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+            >
+              {g.name}
+            </button>
+          ))}
         </div>
       )}
 
@@ -73,16 +125,7 @@ export default function FavoritesPage() {
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="relative group"
               >
-                <MovieCard movie={movie} index={index} />
-                {/* Remove button */}
-                <button
-                  onClick={() => removeFavorite(movie.id)}
-                  className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-red-500/80 text-white 
-                    opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                  aria-label="Remove from favorites"
-                >
-                  <HiTrash className="w-3.5 h-3.5" />
-                </button>
+                <MovieCard movie={movie} index={index} genres={genres} favorites={favorites} fetchFavorites={fetchFavorites} />
               </motion.div>
             ))}
           </motion.div>

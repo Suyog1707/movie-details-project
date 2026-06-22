@@ -118,6 +118,7 @@ function App() {
             <Route path="favorites" element={
               <ProtectedRoute>
                 <FavoritesPage
+                  genres={genres}
                   favorites={favorites}
                   fetchFavorites={fetchFavorites}
                 />

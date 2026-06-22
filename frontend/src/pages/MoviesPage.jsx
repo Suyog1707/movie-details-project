@@ -1,10 +1,107 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiSearch, HiFilter, HiStar } from 'react-icons/hi';
 import MovieCard from '../components/MovieCard';
+import axios from "axios"
 
-export default function MoviesPage() {
+export default function MoviesPage({ genres, favorites, fetchFavorites }) {
+
+  const [searchParams] = useSearchParams();
+  const genreFilter = searchParams.get('genre');
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('rating');
+  const [selectedGenre, setSelectedGenre] = useState(genreFilter || 'All');
+  const [movies, setMovies] = useState([])
+
+  const fetchMovies = async (mediaType, mediaCategory, page) => {
+    const response = await axios.get(`${import.meta.env.VITE_TMDB_URL}/${mediaType}/${mediaCategory}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`, {
+      params: {
+        page: page
+      }
+    })
+
+    return response.data
+  }
+
+  const loadData = async () => {
+    try {
+      const [
+        popularData,
+        topRatedData,
+        nowPlayingData
+      ] = await Promise.all([
+        fetchMovies("movie", "popular", 1),
+        fetchMovies("movie", "top_rated", 1),
+        fetchMovies("movie", "now_playing", 1),
+      ]);
+
+      const res = await axios.get(`${import.meta.env.VITE_TMDB_URL}/trending/movie/week?api_key=${import.meta.env.VITE_TMDB_API_KEY}`)
+
+      const trendingData = res.data
+
+      const allMovies = [
+        ...(nowPlayingData.results || []),
+        ...(topRatedData.results || []),
+        ...(trendingData.results || []),
+        ...(popularData.results || [])
+      ];
+
+      const uniqueMovies = [
+        ...new Map(
+          allMovies.map(movie => [movie.id, movie])
+        ).values()
+      ];
+
+      setMovies(uniqueMovies);
+    } catch (error) {
+      console.error("Error loading movies:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const filtered = useMemo(() => {
+    let result = [...movies];
+
+    if (selectedGenre !== "All") {
+      const genreObj = genres.find(
+        g => g.name === selectedGenre
+      );
+
+      result = result.filter(movie =>
+        movie.genre_ids?.includes(genreObj?.id)
+      );
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+
+      result = result.filter(movie =>
+        movie.title?.toLowerCase().includes(q)
+      );
+    }
+
+    if (sortBy === "rating") {
+      result.sort(
+        (a, b) => b.vote_average - a.vote_average
+      );
+    } else if (sortBy === "year") {
+      result.sort(
+        (a, b) =>
+          new Date(b.release_date) -
+          new Date(a.release_date)
+      );
+    } else if (sortBy === "title") {
+      result.sort((a, b) =>
+        a.title.localeCompare(b.title)
+      );
+    }
+
+    return result;
+  }, [movies, genres, selectedGenre, search, sortBy]);
 
   return (
     <motion.div
@@ -65,7 +162,7 @@ export default function MoviesPage() {
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all 
               ${selectedGenre === g.name ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
           >
-            {g.icon} {g.name}
+            {g.name}
           </button>
         ))}
       </div>
@@ -77,7 +174,7 @@ export default function MoviesPage() {
       {filtered.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filtered.map((movie, index) => (
-            <MovieCard key={movie.id} movie={movie} index={index} />
+            <MovieCard key={index} movie={movie} index={index} genres={genres} favorites={favorites} fetchFavorites={fetchFavorites} />
           ))}
         </div>
       ) : (

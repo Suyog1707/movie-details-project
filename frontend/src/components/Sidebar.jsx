@@ -1,10 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebar } from '../context/SidebarContext';
 import { HiX } from 'react-icons/hi';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import axiosClient from '../../../backend/src/axios/axios.client';
 
 export default function Sidebar({genres}) {
   const { isOpen, close, activeGenre, setActiveGenre } = useSidebar();
@@ -56,8 +53,8 @@ export default function Sidebar({genres}) {
             Genres
           </h3>
           <nav className="space-y-1">
-            {Array.isArray(genres?.genres) &&
-              genres?.genres.map((genre, index) => (
+            {Array.isArray(genres) &&
+              genres?.map((genre, index) => (
                 <motion.button
                   key={genre.id}
                   initial={{ opacity: 0, x: -20 }}

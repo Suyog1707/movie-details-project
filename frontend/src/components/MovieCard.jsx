@@ -10,6 +10,7 @@ export default function MovieCard({ movie, index = 0, showProgress = false, genr
     acc[genre.id] = genre.name;
     return acc;
   }, {});
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -38,21 +39,13 @@ export default function MovieCard({ movie, index = 0, showProgress = false, genr
               <span>{movie.release_date}</span>
             </div>
             <div className="flex items-center gap-1 mt-1.5 flex-wrap">
-              {movie.genre_ids?.slice(0, 2).map(id => (
+              {movie.genre_ids.slice(0, 2).map(id => (
                 <span key={id} className="px-1.5 py-0.5 text-[9px] bg-white/10 rounded-full">
                   {genreMap[id]}
                 </span>
               ))}
             </div>
           </div>
-
-          {/* Quality Badge */}
-          {movie.quality?.[0] && (
-            <div className="absolute top-2 left-2 px-1.5 py-0.5 text-[9px] font-bold 
-              bg-black/70 backdrop-blur-sm rounded text-accent-gold border border-accent-gold/30">
-              {movie.quality[0]}
-            </div>
-          )}
 
           {/* Rating Badge */}
           <div className="absolute top-2 right-2 flex items-center gap-0.5 
@@ -69,8 +62,8 @@ export default function MovieCard({ movie, index = 0, showProgress = false, genr
           onClick={(e) => { e.preventDefault(); toggleFavorites(movie.id, favorites, fetchFavorites); }}
           className={`p-1.5 rounded-full backdrop-blur-sm transition-all duration-200 
             ${isFavorite(movie.id, favorites)
-              ? 'bg-primary text-white'
-              : 'bg-black/60 text-white hover:bg-primary/80'
+              ? 'bg-primary text-white hover:bg-white hover:text-primary'
+              : 'bg-black/60 text-white hover:bg-white hover:text-primary'
             }`}
           aria-label="Toggle favorite"
         >

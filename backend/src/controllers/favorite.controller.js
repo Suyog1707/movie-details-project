@@ -1,8 +1,6 @@
 import responseHandler from "../handlers/response.handler.js";
 import { Favorite } from "../models/favorite.model.js"
-import tmdbApi from "../tmdb/tmdb.api.js";
-import Review from "../models/review.model.js";
-import User from "../models/user.model.js";
+import axios from "axios"
 
 const addFavorite = async (req, res) => {
     try {
@@ -59,10 +57,6 @@ const retryRequest = async (
     } catch (error) {
         if (retries <= 0) throw error;
 
-        console.log(
-            `Retrying request... (${retries} attempts left)`
-        );
-
         await new Promise(resolve =>
             setTimeout(resolve, delay)
         );
@@ -90,10 +84,16 @@ const getFavoritesOfUser = async (req, res) => {
                     const mediaType = "movie"
                     const mediaId = favorite.mediaId
 
-                    const params = { mediaType, mediaId }
-
                     const media = await retryRequest(
-                        () => tmdbApi.mediaDetail(params)
+                        async () => {
+                            const response = await axios.get(`https://api.themoviedb.org/3/${mediaType}/${mediaId}?api_key=${process.env.TMDB_API_KEY}`)
+                            return {
+                                ...response.data,
+                                createdAt: favorite.createdAt,
+                                updatedAt: favorite.updatedAt,
+                                genre_ids: response.data.genres.map((genre) => {return genre.id})
+                            };
+                        }
                     );
 
                     return media
