@@ -57,7 +57,9 @@ const getDetail = async (req, res) => {
 
         const media = await tmdbApi.mediaDetail(params)
 
-        media.credits = await tmdbApi.mediaCredits(params)
+        const credits = await tmdbApi.mediaCredits(params)
+
+        media.credits = credits
 
         const videos = await tmdbApi.mediaVideos(params)
 
@@ -69,7 +71,9 @@ const getDetail = async (req, res) => {
 
         media.image = await tmdbApi.mediaImages(params)
 
-        const user = await User.findById(req.user.id)
+        const user = await User.findOne({
+            user:req.user.userName
+        })
 
         if (user) {
             const isFavorite = await Favorite.findOne({ user: user.id, mediaId })

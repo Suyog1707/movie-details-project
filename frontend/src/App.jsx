@@ -101,6 +101,7 @@ function App() {
             <Route path="details/:mediaId" element={
               <ProtectedRoute>
                 <DetailsPage
+                  genres={genres}
                   favorites={favorites}
                   fetchFavorites={fetchFavorites}
                 />

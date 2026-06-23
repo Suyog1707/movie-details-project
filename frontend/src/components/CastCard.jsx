@@ -11,14 +11,14 @@ export default function CastCard({ actor, index = 0 }) {
       <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-white/10 
         group-hover:border-primary transition-colors duration-300 mb-2">
         <img
-          src={actor.image}
+          src={`${import.meta.env.VITE_IMG_URL}${actor.profile_path}`}
           alt={actor.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           loading="lazy"
         />
       </div>
       <h4 className="text-xs font-semibold text-white truncate">{actor.name}</h4>
-      <p className="text-[10px] text-gray-500 truncate">{actor.character}</p>
+      <p className="text-[10px] text-gray-500 truncate">{actor.character || actor.job}</p>
     </motion.div>
   );
 }

@@ -5,8 +5,57 @@ import CastCard from '../components/CastCard';
 import TrailerCard from '../components/TrailerCard';
 import OTTCard from '../components/OTTCard';
 import MovieCard from '../components/MovieCard';
+import axiosClient from '../axios/axiosClient';
+import { useEffect, useState } from 'react';
+import { isFavorite } from '../utils/IsFavorite';
+import { toggleFavorites } from '../utils/toggleFavorite';
+import axios from 'axios';
 
-export default function DetailsPage() {
+export default function DetailsPage({ genres, favorites, fetchFavorites }) {
+
+  const { mediaId } = useParams();
+  const [item, setItem] = useState(null)
+  const [activeProviderTab, setActiveProviderTab] = useState("flatrate");
+
+  const loadItems = async () => {
+    const mediaType = "movie"
+    const response = await axiosClient.get(`/api/v1/${mediaType}/detail/${mediaId}`)
+    const providers = await axios.get(`${import.meta.env.VITE_TMDB_URL}/movie/${mediaId}/watch/providers?api_key=${import.meta.env.VITE_TMDB_API_KEY}`)
+    const data = {
+      ...response.data,
+      watchProviders: providers?.data?.results?.IN || null
+    }
+    setItem(data)
+  };
+  useEffect(() => {
+    loadItems()
+  }, [mediaId])
+
+  useEffect(() => {
+    if (!item?.watchProviders) return;
+
+    if (item.watchProviders.flatrate) {
+      setActiveProviderTab("flatrate");
+    } else if (item.watchProviders.buy) {
+      setActiveProviderTab("buy");
+    } else if (item.watchProviders.rent) {
+      setActiveProviderTab("rent");
+    }
+  }, [item]);
+
+  console.log(item)
+
+  if (!item) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <p className="text-2xl mb-4">😕</p>
+          <p className="text-gray-400 text-lg">Content not found</p>
+          <Link to="/" className="text-primary text-sm mt-2 inline-block hover:underline">Back to Home</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -17,7 +66,7 @@ export default function DetailsPage() {
       {/* Backdrop Hero */}
       <div className="relative h-[50vh] min-h-[400px] overflow-hidden">
         <img
-          src={item.backdrop}
+          src={`${import.meta.env.VITE_IMG_URL}${item.backdrop_path}`}
           alt={item.title}
           className="w-full h-full object-cover"
         />
@@ -41,7 +90,7 @@ export default function DetailsPage() {
             className="flex-shrink-0"
           >
             <img
-              src={item.poster}
+              src={`${import.meta.env.VITE_IMG_URL}${item.poster_path}`}
               alt={item.title}
               className="w-48 md:w-56 rounded-xl shadow-2xl shadow-black/50 border border-white/10"
             />
@@ -57,9 +106,9 @@ export default function DetailsPage() {
             {/* Genre tags */}
             <div className="flex flex-wrap gap-2 mb-3">
               {item.genres.map(genre => (
-                <span key={genre} className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider 
+                <span key={genre.id} className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider 
                   bg-white/10 backdrop-blur-sm rounded-full border border-white/10">
-                  {genre}
+                  {genre.name}
                 </span>
               ))}
             </div>
@@ -75,61 +124,51 @@ export default function DetailsPage() {
             {/* Meta Row */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300 mb-4">
               <span className="flex items-center gap-1 text-accent-gold font-bold text-base">
-                <HiStar className="w-5 h-5" /> {item.rating}/10
+                <HiStar className="w-5 h-5" /> {item.vote_average === 0 ? item.vote_average : Math.fround(item.vote_average).toFixed(1)}/10
               </span>
               <span className="flex items-center gap-1">
-                <HiCalendar className="w-4 h-4" /> {item.releaseYear}
+                <HiCalendar className="w-4 h-4" /> {item.release_date}
               </span>
               <span className="flex items-center gap-1">
                 <HiClock className="w-4 h-4" /> {item.runtime}
               </span>
-              {item.type === 'tv' && (
-                <span className="flex items-center gap-1">
-                  <HiFilm className="w-4 h-4" /> {item.seasons} Season{item.seasons > 1 ? 's' : ''}
-                </span>
-              )}
             </div>
 
             {/* Details Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-sm">
-              <div>
-                <span className="text-gray-500">Director:</span>
-                <span className="ml-2 text-white">{item.director}</span>
-              </div>
-              <div>
-                <span className="text-gray-500">Producer:</span>
-                <span className="ml-2 text-white">{item.producer}</span>
-              </div>
-              <div className="flex items-center gap-1">
+            <div>
+              <div className="flex items-center mb-4 gap-1">
                 <HiGlobe className="w-4 h-4 text-gray-500" />
                 <span className="text-gray-500">Languages:</span>
-                <span className="ml-1 text-white">{item.languages.join(', ')}</span>
-              </div>
-              <div>
-                <span className="text-gray-500">Quality:</span>
-                <span className="ml-2 flex items-center gap-1">
-                  {item.quality.map(q => (
-                    <span key={q} className="px-2 py-0.5 text-[10px] font-bold bg-accent-gold/10 text-accent-gold rounded">
-                      {q}
-                    </span>
-                  ))}
-                </span>
+                <span className="ml-1 text-white">{item.spoken_languages.map((language, index) => {
+                  if (index !== item.spoken_languages.length - 1) {
+                    return (
+                      <span key={language.iso_639_1}>
+                        {language.english_name},<span> </span>
+                      </span>
+                    )
+                  } else {
+                    return (
+                      <span key={language.iso_639_1}>
+                        {language.english_name}
+                      </span>
+                    )
+                  }
+                })}</span>
               </div>
             </div>
 
             {/* Buttons */}
             <div className="flex flex-wrap items-center gap-3 mb-6">
               <button className="btn-primary flex items-center gap-2">
-                <HiPlay className="w-5 h-5" /> Watch Now
+                <HiPlay className="w-5 h-5" /> Where to Watch
               </button>
               <button
-                onClick={() => toggleFavorite(item)}
-                className={`btn-secondary flex items-center gap-2 ${
-                  isFavorite(item.id) ? '!border-primary !text-primary' : ''
-                }`}
+                onClick={() => toggleFavorites(item.id, favorites, fetchFavorites)}
+                className={`btn-secondary flex items-center gap-2 ${isFavorite(item.id, favorites) ? '!border-primary !text-primary' : ''
+                  }`}
               >
-                <HiHeart className={`w-5 h-5 ${isFavorite(item.id) ? 'fill-primary' : ''}`} />
-                {isFavorite(item.id) ? 'In Favorites' : 'Add to Favorites'}
+                <HiHeart className={`w-5 h-5 ${isFavorite(item.id, favorites) ? 'fill-primary' : ''}`} />
+                {isFavorite(item.id, favorites) ? 'In Favorites' : 'Add to Favorites'}
               </button>
             </div>
 
@@ -144,16 +183,16 @@ export default function DetailsPage() {
               {[...Array(5)].map((_, i) => (
                 <HiStar
                   key={i}
-                  className={`w-5 h-5 ${i < Math.round(item.rating / 2) ? 'text-accent-gold' : 'text-gray-700'}`}
+                  className={`w-5 h-5 ${i < Math.round(item.vote_average / 2) ? 'text-accent-gold' : 'text-gray-700'}`}
                 />
               ))}
-              <span className="text-sm text-gray-400 ml-2">{item.rating}/10</span>
+              <span className="text-sm text-gray-400 ml-2">{item.vote_average === 0 ? item.vote_average : Math.fround(item.vote_average).toFixed(1)}/10</span>
             </div>
           </motion.div>
         </div>
 
         {/* Cast Section */}
-        {item.cast && item.cast.length > 0 && (
+        {item.credits.cast && item.credits.cast.length > 0 && (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -162,9 +201,42 @@ export default function DetailsPage() {
           >
             <h2 className="font-display font-bold text-xl mb-4">🎭 Cast</h2>
             <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
-              {item.cast.map((actor, index) => (
-                <CastCard key={actor.name} actor={actor} index={index} />
+              {item.credits.cast.map((actor, index) => (
+                <CastCard key={index} actor={actor} index={index} />
               ))}
+            </div>
+          </motion.section>
+        )}
+        {item.credits.crew && item.credits.crew.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mt-10"
+          >
+            <h2 className="font-display font-bold text-xl mb-4">🎭 Directing Team</h2>
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
+              {item.credits.crew.map((actor, index) => {
+                if (actor.department === "Directing" && actor.profile_path !== null) {
+                  return <CastCard key={index} actor={actor} index={index} />
+                }
+              })}
+            </div>
+            <h2 className="font-display font-bold text-xl mb-4">🎭 Production Team</h2>
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
+              {item.credits.crew.map((actor, index) => {
+                if (actor.department === "Production" && actor.profile_path !== null) {
+                  return <CastCard key={index} actor={actor} index={index} />
+                }
+              })}
+            </div>
+            <h2 className="font-display font-bold text-xl mb-4">🎭 Other Crew Members</h2>
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
+              {item.credits.crew.map((actor, index) => {
+                if (actor.department !== "Directing" && actor.department !== "Production" && actor.profile_path !== null) {
+                  return <CastCard key={index} actor={actor} index={index} />
+                }
+              })}
             </div>
           </motion.section>
         )}
@@ -187,24 +259,99 @@ export default function DetailsPage() {
         )}
 
         {/* Where to Watch */}
-        {item.platforms && item.platforms.length > 0 && (
+        {item.watchProviders ? (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
             className="mt-10"
           >
-            <h2 className="font-display font-bold text-xl mb-4">📺 Where to Watch</h2>
+            <h2 className="font-display font-bold text-xl mb-4">📺 Providers</h2>
+            <div className="flex gap-2 mb-6">
+              {item.watchProviders?.flatrate && (
+                <button
+                  onClick={() => setActiveProviderTab("flatrate")}
+                  className={`px-4 py-2 rounded-lg transition-all ${activeProviderTab === "flatrate"
+                    ? "bg-primary text-white"
+                    : "bg-white/10 text-gray-400"
+                    }`}
+                >
+                  Streaming
+                </button>
+              )}
+
+              {item.watchProviders?.buy && (
+                <button
+                  onClick={() => setActiveProviderTab("buy")}
+                  className={`px-4 py-2 rounded-lg transition-all ${activeProviderTab === "buy"
+                    ? "bg-primary text-white"
+                    : "bg-white/10 text-gray-400"
+                    }`}
+                >
+                  Buy
+                </button>
+              )}
+
+              {item.watchProviders?.rent && (
+                <button
+                  onClick={() => setActiveProviderTab("rent")}
+                  className={`px-4 py-2 rounded-lg transition-all ${activeProviderTab === "rent"
+                    ? "bg-primary text-white"
+                    : "bg-white/10 text-gray-400"
+                    }`}
+                >
+                  Rent
+                </button>
+              )}
+            </div>
             <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
-              {item.platforms.map((platform, index) => (
-                <OTTCard key={platform.name} platform={platform} index={index} />
-              ))}
+              {activeProviderTab === "flatrate" &&
+                item.watchProviders?.flatrate?.map((provider, i) => (
+                  <OTTCard
+                    key={provider.provider_id}
+                    type="flatrate"
+                    platform={provider}
+                    index={i}
+                  />
+                ))}
+
+              {activeProviderTab === "buy" &&
+                item.watchProviders?.buy?.map((provider, i) => (
+                  <OTTCard
+                    key={provider.provider_id}
+                    type="buy"
+                    platform={provider}
+                    index={i}
+                  />
+                ))}
+
+              {activeProviderTab === "rent" &&
+                item.watchProviders?.rent?.map((provider, i) => (
+                  <OTTCard
+                    key={provider.provider_id}
+                    type="rent"
+                    platform={provider}
+                    index={i}
+                  />
+                ))}
+            </div>
+          </motion.section>
+        ) : (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mt-10"
+          >
+            <h2 className="font-display font-bold text-xl mb-4">📺 Providers</h2>
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
+              <span>There is no Provider for this movie</span>
             </div>
           </motion.section>
         )}
 
         {/* Related Content */}
-        {related.length > 0 && (
+        {item.recommend?.length > 0 && (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -213,8 +360,8 @@ export default function DetailsPage() {
           >
             <h2 className="font-display font-bold text-xl mb-4">🔗 Related Content</h2>
             <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
-              {related.map((movie, index) => (
-                <MovieCard key={movie.id} movie={movie} index={index} />
+              {item.recommend?.map((movie, index) => (
+                <MovieCard key={index} genres={genres} movie={movie} index={index} favorites={favorites} fetchFavorites={fetchFavorites} />
               ))}
             </div>
           </motion.section>
