@@ -19,10 +19,10 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 app.get(
-    "/",
-    (req, res) => {
-        res.send("Server is Running Properly")
-    })
+  "/",
+  (req, res) => {
+    res.send("Server is Running Properly")
+  })
 app.use("/api/v1", routes)
 
 export const server = http.createServer(app)

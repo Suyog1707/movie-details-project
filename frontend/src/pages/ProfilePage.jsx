@@ -6,7 +6,7 @@ import axiosClient from '../axios/axiosClient';
 export default function ProfilePage({ favorites }) {
 
   const { user } = useAuth();
-  
+
   const [name, setName] = useState(
     user?.displayName || ""
   );
@@ -23,12 +23,12 @@ export default function ProfilePage({ favorites }) {
       .toUpperCase()
     : "";
 
-    const handleSubmit = async () => {
-      const response = await axiosClient.put(`/api/v1/user/update-profile`,{
-        displayName: name,
-        bio: bio
-      })
-    }
+  const handleSubmit = async () => {
+    const response = await axiosClient.put(`/api/v1/user/update-profile`, {
+      displayName: name,
+      bio: bio
+    })
+  }
 
   return (
     <div className="px-4 py-8 lg:px-8">

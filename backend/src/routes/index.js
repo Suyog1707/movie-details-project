@@ -9,12 +9,12 @@ const router = express.Router()
 
 router.use("/user", userRouter)
 router.use(
-    "/person", 
+    "/person",
     verifyJWT,
     personRouter
 )
 router.use(
-    "/reviews", 
+    "/reviews",
     verifyJWT,
     reviewRouter
 )

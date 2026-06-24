@@ -91,7 +91,7 @@ const getFavoritesOfUser = async (req, res) => {
                                 ...response.data,
                                 createdAt: favorite.createdAt,
                                 updatedAt: favorite.updatedAt,
-                                genre_ids: response.data.genres.map((genre) => {return genre.id})
+                                genre_ids: response.data.genres.map((genre) => { return genre.id })
                             };
                         }
                     );

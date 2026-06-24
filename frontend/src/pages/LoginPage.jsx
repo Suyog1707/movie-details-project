@@ -9,27 +9,25 @@ export default function LoginPage() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const {login} = useAuth()
+  const { login } = useAuth()
 
-const handleSignIn = async (e) => {
-  e.preventDefault();
+  const handleSignIn = async (e) => {
+    e.preventDefault();
 
-  try {
-    setError("");
+    try {
+      setError("");
 
-    const response = await login({
-      userName,
-      password,
-    });
+      const response = await login({
+        userName,
+        password,
+      });
 
-    console.log(response);
-
-    navigate("/");
-  } catch (error) {
-    setError(error.response?.data?.message || "Login failed");
-    console.error(error);
-  }
-};
+      navigate("/");
+    } catch (error) {
+      setError(error.response?.data?.message || "Login failed");
+      console.error(error);
+    }
+  };
 
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-10 lg:px-8 flex items-center justify-center">

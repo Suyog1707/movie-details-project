@@ -43,8 +43,6 @@ export default function DetailsPage({ genres, favorites, fetchFavorites }) {
     }
   }, [item]);
 
-  console.log(item)
-
   if (!item) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -242,7 +240,7 @@ export default function DetailsPage({ genres, favorites, fetchFavorites }) {
         )}
 
         {/* Trailers Section */}
-        {item.trailers && item.trailers.length > 0 && (
+        {item.videos.results && item.videos.results.length > 0 && (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -251,9 +249,11 @@ export default function DetailsPage({ genres, favorites, fetchFavorites }) {
           >
             <h2 className="font-display font-bold text-xl mb-4">🎥 Trailers</h2>
             <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
-              {item.trailers.map((trailer, index) => (
-                <TrailerCard key={trailer.language} trailer={trailer} index={index} />
-              ))}
+              {item.videos.results.map((trailer, index) => {
+                if (trailer.official === true && trailer.type === "Trailer") {
+                  return <TrailerCard key={trailer.id} trailer={trailer} index={index} />
+                }
+              })}
             </div>
           </motion.section>
         )}

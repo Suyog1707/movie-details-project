@@ -3,11 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebar } from '../context/SidebarContext';
 import { HiX } from 'react-icons/hi';
 
-export default function Sidebar({genres}) {
+export default function Sidebar({ genres }) {
   const { isOpen, close, activeGenre, setActiveGenre } = useSidebar();
   const navigate = useNavigate();
-
-  console.log();
 
   const handleGenreClick = (genre) => {
     setActiveGenre(genre.name === activeGenre ? null : genre.name);

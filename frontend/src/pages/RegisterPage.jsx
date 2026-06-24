@@ -14,25 +14,25 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-const handleSignUp = async (e) => {
-  e.preventDefault();
+  const handleSignUp = async (e) => {
+    e.preventDefault();
 
-  try {
-    setError("");
+    try {
+      setError("");
 
-    await register({
-      userName,
-      displayName,
-      password,
-      confirmPassword,
-    });
+      await register({
+        userName,
+        displayName,
+        password,
+        confirmPassword,
+      });
 
-    navigate("/login");
-  } catch (error) {
-    setError(error.response?.data?.message || "Registration failed");
-    console.error(error)
-  }
-};
+      navigate("/login");
+    } catch (error) {
+      setError(error.response?.data?.message || "Registration failed");
+      console.error(error)
+    }
+  };
 
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-10 lg:px-8 flex items-center justify-center">

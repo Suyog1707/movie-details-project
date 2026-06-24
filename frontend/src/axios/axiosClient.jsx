@@ -13,13 +13,13 @@ axiosClient.interceptors.response.use(
     const originalRequest = error.config;
 
     if (
-      error.response?.status === 401 &&   
+      error.response?.status === 401 &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
 
       try {
-        await axiosClient.post("/api/v1/user/refresh-");
+        await axiosClient.post("/api/v1/user/refresh-token");
 
         return axiosClient(originalRequest);
       } catch (refreshError) {

@@ -72,7 +72,7 @@ const getDetail = async (req, res) => {
         media.image = await tmdbApi.mediaImages(params)
 
         const user = await User.findOne({
-            user:req.user.userName
+            user: req.user.userName
         })
 
         if (user) {

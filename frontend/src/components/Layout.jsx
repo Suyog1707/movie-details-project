@@ -4,7 +4,7 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 
-export default function Layout({genres}) {
+export default function Layout({ genres }) {
 
   return (
     <div className="min-h-screen bg-dark-900 text-white">
