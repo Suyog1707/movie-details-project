@@ -9,7 +9,7 @@ const app = express()
 
 app.use(
   cors({
-    origin: "https://movie-details-project.vercel.app",
+    origin: "https://cineverse-swart.vercel.app/",
     credentials: true,
   })
 );
