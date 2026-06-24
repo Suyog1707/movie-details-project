@@ -8,7 +8,7 @@ import MovieCard from '../components/MovieCard';
 import axiosClient from '../axios/axiosClient';
 import { useEffect, useState } from 'react';
 import { isFavorite } from '../utils/IsFavorite';
-import { toggleFavorites } from '../utils/toggleFavorite';
+import { toggleFavorites } from '../utils/ToggleFavorite';
 import axios from 'axios';
 
 export default function DetailsPage({ genres, favorites, fetchFavorites }) {

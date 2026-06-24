@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiPlay, HiHeart, HiStar, HiCalendar } from 'react-icons/hi';
 import { isFavorite } from '../utils/IsFavorite';
-import { toggleFavorites } from '../utils/toggleFavorite';
+import { toggleFavorites } from '../utils/ToggleFavorite';
 
 const featured = [0, 3, 5, 7]; // indices into the data array
 

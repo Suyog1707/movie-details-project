@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiStar, HiHeart, HiPlay } from 'react-icons/hi';
 import { isFavorite } from '../utils/IsFavorite';
-import { toggleFavorites } from '../utils/toggleFavorite';
+import { toggleFavorites } from '../utils/ToggleFavorite';
 
 export default function MovieCard({ movie, index = 0, showProgress = false, genres, favorites, fetchFavorites }) {
 
