@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiSearch, HiFilter, HiStar } from 'react-icons/hi';
@@ -10,98 +10,135 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
   const [searchParams] = useSearchParams();
   const genreFilter = searchParams.get('genre');
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState('rating');
+  const [sortBy, setSortBy] = useState('none');
   const [selectedGenre, setSelectedGenre] = useState(genreFilter || 'All');
   const [movies, setMovies] = useState([])
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-  const fetchMovies = async (mediaType, mediaCategory, page) => {
-    const response = await axios.get(`${import.meta.env.VITE_TMDB_URL}/${mediaType}/${mediaCategory}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`, {
-      params: {
-        page: page
+  const observer = useRef();
+
+  const fetchMovies = async (pageNumber) => {
+    const response = await axios.get(
+      `${import.meta.env.VITE_TMDB_URL}/discover/movie`,
+      {
+        params: {
+          api_key: import.meta.env.VITE_TMDB_API_KEY,
+          page: pageNumber,
+          sort_by: "popularity.desc",
+        },
       }
-    })
+    );
 
-    return response.data
-  }
+    return response.data;
+  };
 
-  const loadData = async () => {
+  const loadMovies = async (pageNumber) => {
+    if (loading || !hasMore) return;
+
     try {
-      const [
-        popularData,
-        topRatedData,
-        nowPlayingData
-      ] = await Promise.all([
-        fetchMovies("movie", "popular", 1),
-        fetchMovies("movie", "top_rated", 1),
-        fetchMovies("movie", "now_playing", 1),
-      ]);
+      setLoading(true);
 
-      const res = await axios.get(`${import.meta.env.VITE_TMDB_URL}/trending/movie/week?api_key=${import.meta.env.VITE_TMDB_API_KEY}`)
+      const data = await fetchMovies(pageNumber);
 
-      const trendingData = res.data
+      const newMovies = data.results || [];
 
-      const allMovies = [
-        ...(nowPlayingData.results || []),
-        ...(topRatedData.results || []),
-        ...(trendingData.results || []),
-        ...(popularData.results || [])
-      ];
+      setMovies(prev => {
+        const uniqueMovies = [
+          ...new Map(
+            [...prev, ...newMovies].map(movie => [movie.id, movie])
+          ).values()
+        ];
 
-      const uniqueMovies = [
-        ...new Map(
-          allMovies.map(movie => [movie.id, movie])
-        ).values()
-      ];
+        return uniqueMovies;
+      });
 
-      setMovies(uniqueMovies);
+      setHasMore(pageNumber < data.total_pages);
     } catch (error) {
       console.error("Error loading movies:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadMovies(page);
+  }, [page]);
+
+  const lastMovieRef = useCallback(
+    node => {
+      if (loading) return;
+
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+
+      observer.current = new IntersectionObserver(entries => {
+        if (
+          entries[0].isIntersecting &&
+          hasMore
+        ) {
+          setPage(prev => prev + 1);
+        }
+      });
+
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [loading, hasMore]
+  );
 
   const filtered = useMemo(() => {
-    let result = [...movies];
+  let result = [...movies];
 
-    if (selectedGenre !== "All") {
-      const genreObj = genres.find(
-        g => g.name === selectedGenre
-      );
+  if (selectedGenre !== "All") {
+    const genreObj = genres.find(
+      g => g.name === selectedGenre
+    );
 
-      result = result.filter(movie =>
-        movie.genre_ids?.includes(genreObj?.id)
-      );
-    }
+    result = result.filter(movie =>
+      movie.genre_ids?.includes(genreObj?.id)
+    );
+  }
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
+  if (search.trim()) {
+    const q = search.toLowerCase();
 
-      result = result.filter(movie =>
-        movie.title?.toLowerCase().includes(q)
-      );
-    }
+    result = result.filter(movie =>
+      movie.title?.toLowerCase().includes(q)
+    );
+  }
 
-    if (sortBy === "rating") {
+  switch (sortBy) {
+    case "rating":
       result.sort(
         (a, b) => b.vote_average - a.vote_average
       );
-    } else if (sortBy === "year") {
+      break;
+
+    case "year":
       result.sort(
         (a, b) =>
           new Date(b.release_date) -
           new Date(a.release_date)
       );
-    } else if (sortBy === "title") {
+      break;
+
+    case "title":
       result.sort((a, b) =>
         a.title.localeCompare(b.title)
       );
-    }
+      break;
 
-    return result;
-  }, [movies, genres, selectedGenre, search, sortBy]);
+    default:
+      // keep TMDB order
+      break;
+  }
+
+  return result;
+}, [movies, genres, selectedGenre, search, sortBy]);
 
   return (
     <motion.div
@@ -139,6 +176,7 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
             onChange={(e) => setSortBy(e.target.value)}
             className="bg-dark-700 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none cursor-pointer"
           >
+            <option value="none">Default</option>
             <option value="rating">Top Rated</option>
             <option value="year">Newest First</option>
             <option value="title">A-Z</option>
@@ -173,10 +211,41 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
       {/* Movie Grid */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filtered.map((movie, index) => (
-            <MovieCard key={index} movie={movie} index={index} genres={genres} favorites={favorites} fetchFavorites={fetchFavorites} />
-          ))}
+          {filtered.map((movie, index) => {
+            if (filtered.length === index + 1) {
+              return (
+                <div ref={lastMovieRef} key={index}>
+                  <MovieCard
+                    movie={movie}
+                    index={index}
+                    genres={genres}
+                    favorites={favorites}
+                    fetchFavorites={fetchFavorites}
+                  />
+                </div>
+              );
+            }
+
+            return (
+              <MovieCard
+                key={index}
+                movie={movie}
+                index={index}
+                genres={genres}
+                favorites={favorites}
+                fetchFavorites={fetchFavorites}
+              />
+            );
+          })}
+          {loading && (
+            <div className="flex justify-center py-8">
+              <div className="text-gray-400">
+                Loading more movies...
+              </div>
+            </div>
+          )}
         </div>
+
       ) : (
         <div className="text-center py-20">
           <p className="text-gray-500 text-lg mb-2">No movies found</p>

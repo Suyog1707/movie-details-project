@@ -3,13 +3,22 @@ import { motion } from 'framer-motion';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import MovieCard from './MovieCard';
 
-export default function SectionRow({ title, subtitle, items, showProgress = false, genres, favorites, fetchFavorites }) {
+export default function SectionRow({ title, subtitle, items, showProgress = false, onLoadMore, genres, favorites, fetchFavorites }) {
+  
   const scrollRef = useRef(null);
-
+  
   const scroll = (direction) => {
     if (scrollRef.current) {
       const amount = direction === 'left' ? -600 : 600;
       scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
+
+  const handleScroll = (e) => {
+    const { scrollLeft, scrollWidth, clientWidth } = e.target;
+
+    if (scrollLeft + clientWidth >= scrollWidth - 1000) {
+      onLoadMore();
     }
   };
 
@@ -55,11 +64,12 @@ export default function SectionRow({ title, subtitle, items, showProgress = fals
       {/* Scroll Container */}
       <div
         ref={scrollRef}
+        onScroll={handleScroll}
         className="flex gap-4 overflow-x-auto hide-scrollbar scroll-smooth snap-x snap-mandatory pb-4 px-1"
       >
         {Array.isArray(items) &&
           items.map((item, index) => (
-            <div key={item.id} className="snap-start">
+            <div key={index} className="snap-start">
               <MovieCard
                 movie={item}
                 genres={genres}

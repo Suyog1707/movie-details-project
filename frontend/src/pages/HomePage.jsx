@@ -13,51 +13,150 @@ export default function HomePage({ favorites, genres, fetchFavorites }) {
   const [upcoming, setUpcoming] = useState([])
   const [allContent, setAllContent] = useState([])
 
-  const fetchData = async (mediaType, mediaCategory, page) => {
-    const response = await axios.get(`${import.meta.env.VITE_TMDB_URL}/${mediaType}/${mediaCategory}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`, {
-      params: {
-        page: page
-      }
-    })
+  const [popularPage, setPopularPage] = useState(0);
+  const [topRatedPage, setTopRatedPage] = useState(0);
+  const [upcomingPage, setUpcomingPage] = useState(0);
+  const [trendingPage, setTrendingPage] = useState(0);
 
-    return response.data
+  const fetchData = async (mediaType, mediaCategory, page) => {
+    if (mediaCategory !== "trending") {
+      const response = await axios.get(`${import.meta.env.VITE_TMDB_URL}/${mediaType}/${mediaCategory}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`, {
+        params: {
+          page: page
+        }
+      })
+
+      return response.data
+    } else {
+      const response = await axios.get(`${import.meta.env.VITE_TMDB_URL}/${mediaCategory}/${mediaType}/week?api_key=${import.meta.env.VITE_TMDB_API_KEY}`, {
+        params: {
+          page: page
+        }
+      })
+
+      return response.data
+    }
   }
 
+  const loadMorePopular = async () => {
+    try {
+      const nextPage = popularPage + 1;
+
+      const data = await fetchData(
+        "movie",
+        "popular",
+        nextPage
+      );
+
+      setPopularMovies(prev => {
+        const merged = [...prev, ...data.results];
+
+        return Array.from(
+          new Map(
+            merged.map(movie => [movie.id, movie])
+          ).values()
+        );
+      });
+
+      setPopularPage(nextPage);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const loadMoreTopRated = async () => {
+    try {
+      const nextPage = topRatedPage + 1;
+
+      const data = await fetchData(
+        "movie",
+        "top_rated",
+        nextPage
+      );
+
+      setTopRated(prev => {
+        const merged = [...prev, ...data.results];
+
+        return Array.from(
+          new Map(
+            merged.map(movie => [movie.id, movie])
+          ).values()
+        );
+      });
+
+      setTopRatedPage(nextPage);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const loadMoreUpcoming = async () => {
+    try {
+      const nextPage = upcomingPage + 1;
+
+      const data = await fetchData(
+        "movie",
+        "upcoming",
+        nextPage
+      );
+
+      setUpcoming(prev => {
+        const merged = [...prev, ...data.results];
+
+        return Array.from(
+          new Map(
+            merged.map(movie => [movie.id, movie])
+          ).values()
+        );
+      });
+
+      setUpcomingPage(nextPage);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const loadMoreTrending = async () => {
+    try {
+      const nextPage = trendingPage + 1;
+
+      const data = await fetchData(
+        "movie",
+        "trending",
+        nextPage
+      );
+
+      setTrending(prev => {
+        const merged = [...prev, ...data.results];
+
+        return Array.from(
+          new Map(
+            merged.map(movie => [movie.id, movie])
+          ).values()
+        );
+      });
+
+      setTrendingPage(nextPage);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [
-          popularData,
-          topRatedData,
-          upcomingData,
-        ] = await Promise.all([
-          fetchData("movie", "popular", 1),
-          fetchData("movie", "top_rated", 1),
-          fetchData("movie", "upcoming", 1),
-        ]);
-
-        const res = await axios.get(`${import.meta.env.VITE_TMDB_URL}/trending/movie/week?api_key=${import.meta.env.VITE_TMDB_API_KEY}`)
-
-        const trendingData = res.data
-
-        setTrending(trendingData);
-        setPopularMovies(popularData);
-        setTopRated(topRatedData);
-        setUpcoming(upcomingData);
-
-        setAllContent([
-          ...(trendingData.results || []),
-          ...(popularData.results || []),
-          ...(topRatedData.results || []),
-          ...(upcomingData.results || []),
-        ]);
-      } catch (error) {
-        console.error("Error loading movies:", error);
-      }
-    };
-
-    loadData();
+    loadMoreTrending(),
+      loadMorePopular(),
+      loadMoreTopRated(),
+      loadMoreUpcoming()
   }, []);
+
+  useEffect(() => {
+    setAllContent([
+      ...trending,
+      ...popularMovies,
+      ...topRated,
+      ...upcoming
+    ]);
+  }, [trending, popularMovies, topRated, upcoming]);
 
   return (
     <motion.div
@@ -74,12 +173,13 @@ export default function HomePage({ favorites, genres, fetchFavorites }) {
       />
 
       {/* Content Sections */}
-      <div className="px-4 lg:px-8 -mt-10 relative z-10">
+      <div className="px-4 lg:px-8 mt-10 relative z-10">
 
         <SectionRow
           title="🔥 Trending Now"
           subtitle="What everyone is watching"
-          items={trending.results || []}
+          items={trending || []}
+          onLoadMore={loadMoreTrending}
           genres={genres}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
@@ -88,7 +188,8 @@ export default function HomePage({ favorites, genres, fetchFavorites }) {
         <SectionRow
           title="🎬 Popular Movies"
           subtitle="Most watched this month"
-          items={popularMovies.results || []}
+          items={popularMovies || []}
+          onLoadMore={loadMorePopular}
           genres={genres}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
@@ -97,7 +198,8 @@ export default function HomePage({ favorites, genres, fetchFavorites }) {
         <SectionRow
           title="⭐ Top Rated"
           subtitle="Critically acclaimed content"
-          items={topRated.results || []}
+          items={topRated || []}
+          onLoadMore={loadMoreTopRated}
           genres={genres}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
@@ -106,7 +208,8 @@ export default function HomePage({ favorites, genres, fetchFavorites }) {
         <SectionRow
           title="Upcoming"
           subtitle="What is coming next"
-          items={upcoming.results || []}
+          items={upcoming || []}
+          onLoadMore={loadMoreUpcoming}
           genres={genres}
           favorites={favorites}
           fetchFavorites={fetchFavorites}
