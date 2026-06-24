@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiSearch, HiFilter, HiStar } from 'react-icons/hi';
+import loading from "../../public/loading.svg"
 import MovieCard from '../components/MovieCard';
 import axios from "axios"
 
@@ -240,7 +241,7 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
           {loading && (
             <div className="flex justify-center py-8">
               <div className="text-gray-400">
-                Loading more movies...
+                <img src={loading}></img>
               </div>
             </div>
           )}

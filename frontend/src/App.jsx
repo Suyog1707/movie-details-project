@@ -12,6 +12,7 @@ import { SidebarProvider } from './context/SidebarContext';
 import { useAuth } from './context/AuthContext';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import loadingIcon from "../public/loading.svg"
 import axiosClient from './axios/axiosClient';
 import axios from 'axios';
 
@@ -19,7 +20,7 @@ const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen"><img src={loadingIcon} className=' justify-center item-center w-24 h-24'></img></div>;
   }
 
   return user
