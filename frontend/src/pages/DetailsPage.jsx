@@ -114,6 +114,43 @@ export default function DetailsPage({ genres, favorites, fetchFavorites }) {
     );
   }
 
+    const directingCrew = item.credits.crew.filter(
+    p => p.department === "Directing" && p.profile_path
+  );
+
+  const productionCrew = item.credits.crew.filter(
+    p => p.department === "Production" && p.profile_path
+  );
+
+  const otherCrew = item.credits.crew.filter(
+    p =>
+      p.department !== "Directing" &&
+      p.department !== "Production" &&
+      p.profile_path
+  );
+
+  const CrewSection = ({ title, crew }) => (
+    <>
+      <h2 className="font-display font-bold text-xl mb-4 mt-8">
+        {title}
+      </h2>
+
+      {crew.length ? (
+        <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
+          {crew.map((person, index) => (
+            <CastCard
+              key={person.id}
+              actor={person}
+              index={index}
+            />
+          ))}
+        </div>
+      ) : (
+        <p>No members found.</p>
+      )}
+    </>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -271,30 +308,9 @@ export default function DetailsPage({ genres, favorites, fetchFavorites }) {
             transition={{ delay: 0.4 }}
             className="mt-10"
           >
-            <h2 className="font-display font-bold text-xl mb-4">🎭 Directing Team</h2>
-            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
-              {item.credits.crew.map((actor, index) => {
-                if (actor.department === "Directing" && actor.profile_path !== null) {
-                  return <CastCard key={index} actor={actor} index={index} />
-                }
-              })}
-            </div>
-            <h2 className="font-display font-bold text-xl mb-4">🎭 Production Team</h2>
-            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
-              {item.credits.crew.map((actor, index) => {
-                if (actor.department === "Production" && actor.profile_path !== null) {
-                  return <CastCard key={index} actor={actor} index={index} />
-                }
-              })}
-            </div>
-            <h2 className="font-display font-bold text-xl mb-4">🎭 Other Crew Members</h2>
-            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
-              {item.credits.crew.map((actor, index) => {
-                if (actor.department !== "Directing" && actor.department !== "Production" && actor.profile_path !== null) {
-                  return <CastCard key={index} actor={actor} index={index} />
-                }
-              })}
-            </div>
+            <CrewSection title="🎬 Directing Team" crew={directingCrew} />
+            <CrewSection title="🏭 Production Team" crew={productionCrew} />
+            <CrewSection title="🎥 Other Crew Members" crew={otherCrew} />
           </motion.section>
         )}
 
