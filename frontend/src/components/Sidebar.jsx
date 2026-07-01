@@ -15,13 +15,21 @@ export default function Sidebar({ genres }) {
   const location = useLocation();
 
   const handleGenreClick = (genre) => {
-    const basePath = location.pathname;
+    const basePath = location?.pathname;
 
     if (genre.name === activeGenre) {
       setActiveGenre("All");
-      navigate(basePath);
+      if (basePath !== "/") {
+        navigate(basePath);
+      } else {
+        navigate(`/movies?genre=All`)
+      }
     } else {
-      navigate(`${basePath}?genre=${encodeURIComponent(genre.name)}`);
+      if (basePath !== "/") {
+        navigate(`${basePath}?genre=${encodeURIComponent(genre.name)}`);
+      } else {
+        navigate(`/movies?genre=${encodeURIComponent(genre.name)}`)
+      }
       setActiveGenre(genre.name);
     }
 
