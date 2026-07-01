@@ -1,17 +1,38 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebar } from '../context/SidebarContext';
 import { HiX } from 'react-icons/hi';
+import { useState, useEffect } from "react";
 
 export default function Sidebar({ genres }) {
-  const { isOpen, close, activeGenre, setActiveGenre } = useSidebar();
+  const { isOpen, close } = useSidebar();
+
+  const [searchParams] = useSearchParams();
+
+  const [activeGenre, setActiveGenre] = useState(searchParams.get("genre") || "All");
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleGenreClick = (genre) => {
-    setActiveGenre(genre.name === activeGenre ? null : genre.name);
-    navigate(`/movies?genre=${encodeURIComponent(genre.name)}`);
+    const basePath = location.pathname;
+
+    if (genre.name === activeGenre) {
+      setActiveGenre("All");
+      navigate(basePath);
+    } else {
+      navigate(`${basePath}?genre=${encodeURIComponent(genre.name)}`);
+      setActiveGenre(genre.name);
+    }
+
     close();
   };
+
+  useEffect(() => {
+    const genre = searchParams.get("genre");
+
+    setActiveGenre(genre || "All");
+  }, [searchParams]);
 
   return (
     <>

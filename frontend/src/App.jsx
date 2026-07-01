@@ -12,7 +12,7 @@ import { SidebarProvider } from './context/SidebarContext';
 import { useAuth } from './context/AuthContext';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import loadingIcon from "../public/loading.svg"
+import loadingIcon from "/loading.svg"
 import axiosClient from './axios/axiosClient';
 import axios from 'axios';
 
@@ -20,7 +20,36 @@ const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen"><img src={loadingIcon} className=' justify-center item-center w-24 h-24'></img></div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="w-16 h-16 animate-spin text-primary">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="animate-spin"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeOpacity="0.2"
+            />
+
+            <path
+              d="M22 12a10 10 0 0 1-10 10"
+              stroke="#E50914"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+      </div>
+    )
   }
 
   return user
@@ -38,16 +67,22 @@ const PublicRoute = ({ children }) => {
 
 function App() {
 
-  const { checkAuth } = useAuth();
+  const { user, checkAuth } = useAuth();
 
   const [favorites, setFavorites] = useState([])
+  const [loadingFavorites, setLoadingFavorites] = useState(true);
   const [genres, setGenres] = useState([])
 
   const fetchFavorites = async () => {
-    const response = await axiosClient.get(`/api/v1/user/favorites`)
-    setFavorites(
-      response.data
-    )
+    try {
+      setLoadingFavorites(true);
+      const response = await axiosClient.get(`/api/v1/user/favorites`)
+      setFavorites(
+        response.data
+      )
+    } finally {
+      setLoadingFavorites(false);
+    }
   }
 
   const fetchGenres = async () => {
@@ -56,11 +91,12 @@ function App() {
   }
 
   useEffect(() => {
-    if (!checkAuth) return;
+    fetchGenres();
 
-    fetchFavorites();
-    fetchGenres()
-  }, [checkAuth]);
+    if (user) {
+      fetchFavorites();
+    }
+  }, [user]);
 
   return (
     <Router>
@@ -122,6 +158,7 @@ function App() {
                 <FavoritesPage
                   genres={genres}
                   favorites={favorites}
+                  loadingFavorites={loadingFavorites}
                   fetchFavorites={fetchFavorites}
                 />
               </ProtectedRoute>

@@ -25,7 +25,7 @@ export const verifyJWT = async (req, res, next) => {
 
         next()
     } catch (error) {
-        console.error(error)
-        responseHandler.error(res)
+        console.error(error);
+        return responseHandler.unauthorize(res);
     }
 }

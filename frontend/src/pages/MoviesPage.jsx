@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiSearch, HiFilter, HiStar } from 'react-icons/hi';
-import loading from "../../public/loading.svg"
+import loadingImage from "/loading.svg"
+import MovieCardSkeleton from "../components/MovieCardSkeleton";
 import MovieCard from '../components/MovieCard';
 import axios from "axios"
 
@@ -16,7 +17,9 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
   const [movies, setMovies] = useState([])
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(true)
+  const [initialLoading, setInitialLoading] = useState(true);
+  const navigate = useNavigate();
 
   const observer = useRef();
 
@@ -38,34 +41,40 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
   const loadMovies = async (pageNumber) => {
     if (loading || !hasMore) return;
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
+    try {
       const data = await fetchMovies(pageNumber);
 
       const newMovies = data.results || [];
 
-      setMovies(prev => {
-        const uniqueMovies = [
-          ...new Map(
-            [...prev, ...newMovies].map(movie => [movie.id, movie])
-          ).values()
-        ];
-
-        return uniqueMovies;
-      });
+      setMovies(prev => [
+        ...new Map(
+          [...prev, ...newMovies].map(movie => [movie.id, movie])
+        ).values()
+      ]);
 
       setHasMore(pageNumber < data.total_pages);
     } catch (error) {
-      console.error("Error loading movies:", error);
+      console.error(error);
     } finally {
       setLoading(false);
+
+      if (pageNumber === 1) {
+        setInitialLoading(false);
+      }
     }
   };
 
   useEffect(() => {
     loadMovies(page);
   }, [page]);
+
+  useEffect(() => {
+    const genre = searchParams.get("genre");
+
+    setSelectedGenre(genre || "All");
+  }, [searchParams]);
 
   const lastMovieRef = useCallback(
     node => {
@@ -92,54 +101,84 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
   );
 
   const filtered = useMemo(() => {
-  let result = [...movies];
+    let result = [...movies];
 
-  if (selectedGenre !== "All") {
-    const genreObj = genres.find(
-      g => g.name === selectedGenre
-    );
+    if (selectedGenre !== "All") {
+      const genreObj = genres.find(
+        g => g.name === selectedGenre
+      );
 
-    result = result.filter(movie =>
-      movie.genre_ids?.includes(genreObj?.id)
+      result = result.filter(movie =>
+        movie.genre_ids?.includes(genreObj?.id)
+      );
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+
+      result = result.filter(movie =>
+        movie.title?.toLowerCase().includes(q)
+      );
+    }
+
+    switch (sortBy) {
+      case "rating":
+        result.sort(
+          (a, b) => b.vote_average - a.vote_average
+        );
+        break;
+
+      case "year":
+        result.sort(
+          (a, b) =>
+            new Date(b.release_date) -
+            new Date(a.release_date)
+        );
+        break;
+
+      case "title":
+        result.sort((a, b) =>
+          a.title.localeCompare(b.title)
+        );
+        break;
+
+      default:
+        // keep TMDB order
+        break;
+    }
+
+    return result;
+  }, [movies, genres, selectedGenre, search, sortBy]);
+
+  if (initialLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="px-4 lg:px-8 py-6"
+      >
+        <div className="mb-6">
+          <h1 className="font-display font-bold text-2xl md:text-3xl">
+            🎬 Movies
+          </h1>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {Array.from({ length: 15 }).map((_, index) => (
+            <MovieCardSkeleton key={index} />
+          ))}
+        </div>
+      </motion.div>
     );
   }
 
-  if (search.trim()) {
-    const q = search.toLowerCase();
-
-    result = result.filter(movie =>
-      movie.title?.toLowerCase().includes(q)
-    );
-  }
-
-  switch (sortBy) {
-    case "rating":
-      result.sort(
-        (a, b) => b.vote_average - a.vote_average
-      );
-      break;
-
-    case "year":
-      result.sort(
-        (a, b) =>
-          new Date(b.release_date) -
-          new Date(a.release_date)
-      );
-      break;
-
-    case "title":
-      result.sort((a, b) =>
-        a.title.localeCompare(b.title)
-      );
-      break;
-
-    default:
-      // keep TMDB order
-      break;
-  }
-
-  return result;
-}, [movies, genres, selectedGenre, search, sortBy]);
+  const handleGenreClick = (genreName) => {
+    if (genreName === selectedGenre) {
+      navigate("/movies");
+    } else {
+      navigate(`/movies?genre=${encodeURIComponent(genreName)}`);
+    }
+  };
 
   return (
     <motion.div
@@ -188,7 +227,7 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
       {/* Genre Tags */}
       <div className="flex flex-wrap gap-2 mb-8">
         <button
-          onClick={() => setSelectedGenre('All')}
+          onClick={() => handleGenreClick('All')}
           className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all 
             ${selectedGenre === 'All' ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
         >
@@ -197,7 +236,7 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
         {genres.map(g => (
           <button
             key={g.id}
-            onClick={() => setSelectedGenre(g.name)}
+            onClick={() => handleGenreClick(g.name)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all 
               ${selectedGenre === g.name ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
           >
@@ -238,10 +277,33 @@ export default function MoviesPage({ genres, favorites, fetchFavorites }) {
               />
             );
           })}
-          {loading && (
-            <div className="flex justify-center py-8">
-              <div className="text-gray-400">
-                <img src={loading}></img>
+          {loading && !initialLoading && (
+            <div className="flex items-center justify-center h-screen">
+              <div className="w-16 h-16 animate-spin text-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="64"
+                  height="64"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="animate-spin"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeOpacity="0.2"
+                  />
+
+                  <path
+                    d="M22 12a10 10 0 0 1-10 10"
+                    stroke="#E50914"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </div>
             </div>
           )}

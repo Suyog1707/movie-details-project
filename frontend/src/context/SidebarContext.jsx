@@ -4,14 +4,13 @@ const SidebarContext = createContext();
 
 export function SidebarProvider({ children }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeGenre, setActiveGenre] = useState(null);
 
   const toggle = () => setIsOpen(prev => !prev);
   const open = () => setIsOpen(true);
   const close = () => setIsOpen(false);
 
   return (
-    <SidebarContext.Provider value={{ isOpen, toggle, open, close, activeGenre, setActiveGenre }}>
+    <SidebarContext.Provider value={{ isOpen, toggle, open, close }}>
       {children}
     </SidebarContext.Provider>
   );

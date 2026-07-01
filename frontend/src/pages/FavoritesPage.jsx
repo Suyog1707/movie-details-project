@@ -1,16 +1,24 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiFilter, HiTrash } from 'react-icons/hi';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import MovieCard from '../components/MovieCard';
+import MovieCardSkeleton from "../components/MovieCardSkeleton";
 
-export default function FavoritesPage({ genres, favorites, fetchFavorites }) {
+export default function FavoritesPage({ genres, favorites, fetchFavorites, loadingFavorites }) {
 
   const [searchParams] = useSearchParams();
   const genreFilter = searchParams.get('genre');
-  const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('added');
   const [selectedGenre, setSelectedGenre] = useState(genreFilter || 'All');
+  const navigate = useNavigate();
+  
+
+  useEffect(() => {
+    const genre = searchParams.get("genre");
+
+    setSelectedGenre(genre || "All");
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     let result = [...favorites];
@@ -22,14 +30,6 @@ export default function FavoritesPage({ genres, favorites, fetchFavorites }) {
 
       result = result.filter(movie =>
         movie.genre_ids?.includes(genreObj?.id)
-      );
-    }
-
-    if (search.trim()) {
-      const q = search.toLowerCase();
-
-      result = result.filter(movie =>
-        movie.title?.toLowerCase().includes(q)
       );
     }
 
@@ -57,7 +57,15 @@ export default function FavoritesPage({ genres, favorites, fetchFavorites }) {
     }
 
     return result;
-  }, [favorites, genres, selectedGenre, search, sortBy]);
+  }, [favorites, genres, selectedGenre, sortBy]);
+
+  const handleGenreClick = (genreName) => {
+    if (genreName === selectedGenre) {
+      navigate("/favorites?genre=All");
+    } else {
+      navigate(`/favorites?genre=${encodeURIComponent(genreName)}`);
+    }
+  };
 
   return (
     <motion.div
@@ -92,7 +100,7 @@ export default function FavoritesPage({ genres, favorites, fetchFavorites }) {
       {favorites.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-8">
           <button
-            onClick={() => setSelectedGenre('All')}
+            onClick={() => handleGenreClick('All')}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all 
             ${selectedGenre === 'All' ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
           >
@@ -101,7 +109,7 @@ export default function FavoritesPage({ genres, favorites, fetchFavorites }) {
           {genres.map(g => (
             <button
               key={g.id}
-              onClick={() => setSelectedGenre(g.name)}
+              onClick={() => handleGenreClick(g.name)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all 
               ${selectedGenre === g.name ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
             >
@@ -113,7 +121,13 @@ export default function FavoritesPage({ genres, favorites, fetchFavorites }) {
 
       {/* Grid */}
       <AnimatePresence mode="popLayout">
-        {filtered.length > 0 ? (
+        {loadingFavorites ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {Array.from({ length: 10 }).map((_, index) => (
+              <MovieCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : filtered.length > 0 ? (
           <motion.div
             layout
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4"

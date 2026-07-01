@@ -16,17 +16,38 @@ export default function DetailsPage({ genres, favorites, fetchFavorites }) {
   const { mediaId } = useParams();
   const [item, setItem] = useState(null)
   const [activeProviderTab, setActiveProviderTab] = useState("flatrate");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const loadItems = async () => {
-    const mediaType = "movie"
-    const response = await axiosClient.get(`/api/v1/${mediaType}/detail/${mediaId}`)
-    const providers = await axios.get(`${import.meta.env.VITE_TMDB_URL}/movie/${mediaId}/watch/providers?api_key=${import.meta.env.VITE_TMDB_API_KEY}`)
-    const data = {
-      ...response.data,
-      watchProviders: providers?.data?.results?.IN || null
+    try {
+      setLoading(true);
+      setError(false);
+      setItem(null);
+
+      const mediaType = "movie";
+
+      const [response, providers] = await Promise.all([
+        axiosClient.get(`/api/v1/movie/detail/${mediaId}`),
+        axios.get(
+          `${import.meta.env.VITE_TMDB_URL}/movie/${mediaId}/watch/providers?api_key=${import.meta.env.VITE_TMDB_API_KEY}`
+        ),
+      ]);
+
+      const data = {
+        ...response.data,
+        watchProviders: providers?.data?.results?.IN || null,
+      };
+
+      setItem(data);
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    } finally {
+      setLoading(false);
     }
-    setItem(data)
   };
+
   useEffect(() => {
     loadItems()
   }, [mediaId])
@@ -43,13 +64,51 @@ export default function DetailsPage({ genres, favorites, fetchFavorites }) {
     }
   }, [item]);
 
-  if (!item) {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="w-16 h-16 animate-spin text-primary">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="animate-spin"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeOpacity="0.2"
+            />
+
+            <path
+              d="M22 12a10 10 0 0 1-10 10"
+              stroke="#E50914"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <p className="text-2xl mb-4">😕</p>
           <p className="text-gray-400 text-lg">Content not found</p>
-          <Link to="/" className="text-primary text-sm mt-2 inline-block hover:underline">Back to Home</Link>
+          <Link
+            to="/"
+            className="text-primary text-sm mt-2 inline-block hover:underline"
+          >
+            Back to Home
+          </Link>
         </div>
       </div>
     );

@@ -7,9 +7,6 @@ import { useSidebar } from '../context/SidebarContext';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showNotifications, setShowNotifications] = useState(false);
   const location = useLocation();
   const { toggle } = useSidebar();
   const navigate = useNavigate();
@@ -17,8 +14,9 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Movies', path: '/movies' },
-    { name: 'Favorites', path: '/favorites' },
+    { name: 'Movies', path: '/movies?genre=All' },
+    { name: 'Favorites', path: '/favorites?genre=All' },
+    { name: "Search", path: "/search" },
   ];
 
   const initials = user?.displayName
@@ -33,6 +31,23 @@ export default function Navbar() {
     await logout()
     navigate("/");
   }
+
+  const handleSearch = () => {
+    navigate(`/search`);
+  };
+
+  useEffect(() => {
+  const handler = (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      e.preventDefault();
+      navigate("/search");
+    }
+  };
+
+  window.addEventListener("keydown", handler);
+
+  return () => window.removeEventListener("keydown", handler);
+}, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
@@ -77,45 +92,15 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           {/* Search */}
           <AnimatePresence>
-            {searchOpen ? (
-              <motion.form
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: 250, opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                onSubmit={handleSearch}
-                className="flex items-center overflow-hidden"
-              >
-                <div className="flex items-center bg-dark-600 border border-white/10 rounded-lg px-3 py-2 w-full">
-                  <HiSearch className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search movies, shows..."
-                    className="bg-transparent text-sm text-white placeholder-gray-500 ml-2 outline-none w-full"
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSearchOpen(false)}
-                    className="ml-1 flex-shrink-0"
-                  >
-                    <HiX className="w-4 h-4 text-gray-400 hover:text-white" />
-                  </button>
-                </div>
-              </motion.form>
-            ) : (
               <motion.button
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
-                onClick={() => setSearchOpen(true)}
+                onClick={() => handleSearch()}
                 className="btn-icon"
                 aria-label="Search"
               >
                 <HiSearch className="w-5 h-5" />
               </motion.button>
-            )}
           </AnimatePresence>
 
           {/* Auth actions */}

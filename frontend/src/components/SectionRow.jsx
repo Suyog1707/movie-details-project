@@ -18,7 +18,7 @@ export default function SectionRow({ title, subtitle, items, showProgress = fals
     const { scrollLeft, scrollWidth, clientWidth } = e.target;
 
     if (scrollLeft + clientWidth >= scrollWidth - 1000) {
-      onLoadMore();
+      onLoadMore?.();
     }
   };
 
