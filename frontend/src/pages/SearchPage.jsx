@@ -47,8 +47,6 @@ export default function SearchPage({ genres, favorites, fetchFavorites }) {
           }
         );
 
-        console.log(response)
-
         setMovies(response.data.results || []);
       } catch (error) {
         console.error(error);

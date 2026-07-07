@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  server:
+    build: ./backend
+    container_name: cineverse-server
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    networks:
+      - fullstack-network
+    restart: unless-stopped
+
+  client:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_BASE_URL=${VITE_BASE_URL}
+        - VITE_IMG_URL=${VITE_IMG_URL}
+        - VITE_TMDB_URL=${VITE_TMDB_URL}
+        - VITE_TMDB_API_KEY=${VITE_TMDB_API_KEY}
+    container_name: cineverse-client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - fullstack-network
+    restart: unless-stopped
+
+networks:
+  fullstack-network:
+    driver: bridge

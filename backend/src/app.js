@@ -9,7 +9,11 @@ const app = express()
 
 app.use(
   cors({
-    origin: "https://cineverse-swart.vercel.app",
+    origin: [
+      "https://cineverse-swart.vercel.app",
+      "http://localhost:5173",
+      "http://localhost"
+    ],
     credentials: true,
   })
 );

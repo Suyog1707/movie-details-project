@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000
 
 connetDB()
     .then(
-        server.listen(port, () => {
+        server.listen(port, "0.0.0.0", () => {
             console.log(`⚙️  SERVER is running at http://localhost:${port}`)
         })
     ).catch((error) => {
