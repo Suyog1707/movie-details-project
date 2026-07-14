@@ -9,8 +9,7 @@ const favoriteSchema = new mongoose.Schema({
   },
   mediaId: {
     type: Number,
-    required: true,
-    unique: true,
+    required: true
   },
 },
   modelOptions)

@@ -57,6 +57,10 @@ const getDetail = async (req, res) => {
 
         const media = await tmdbApi.mediaDetail(params)
 
+        if (!media) {
+            return responseHandler.error(res, "Failed to fetch movie details");
+        }
+
         const credits = await tmdbApi.mediaCredits(params)
 
         media.credits = credits
@@ -71,15 +75,12 @@ const getDetail = async (req, res) => {
 
         media.image = await tmdbApi.mediaImages(params)
 
-        const user = await User.findOne({
-            user: req.user.userName
-        })
+        const isFavorite = await Favorite.findOne({
+            user: req.user.id,
+            mediaId: Number(mediaId)
+        });
 
-        if (user) {
-            const isFavorite = await Favorite.findOne({ user: user.id, mediaId })
-
-            media.isFavorite = isFavorite !== null
-        }
+        media.isFavorite = !!isFavorite;
 
         media.reviews = await Review.find({ mediaId }).populate("user").sort("-createdAt")
 
